@@ -1,0 +1,1125 @@
+/* ==========================================================================
+   JobConnect - Theme "TÁI SINH – BÙNG CHÁY" (Rebirth - Ignite)
+   Hành trình: Tro tàn → Tia lửa → Bùng cháy → Bước đi
+   ========================================================================== */
+
+/* Typography Imports */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,400;1,600;1,700&display=swap');
+
+/* ==========================================
+   1. COLOR PALETTE & VARIABLES
+   ========================================== */
+[data-theme="rebirth"] {
+  /* Bảng màu chủ đạo */
+  --ash-black:   #0B0908;  /* nền chính, đen ám khói, hơi ấm */
+  --char:        #1A1412;  /* nền card, section phụ */
+  --oxblood:     #5A1A1E;  /* đỏ rượu, viền, vùng tối của lửa */
+  --bone:        #D9CFC0;  /* màu sáp nến, dùng cho chữ chính */
+  --steel:       #6F8CA8;  /* xanh thép lạnh, chỉ dùng cho trạng thái "trước khi cháy" */
+  --crimson:     #E0303F;  /* đỏ chủ đạo cho hành động chính */
+  --ember:       #FF7A2B;  /* cam than hồng */
+  --flare-pink:  #FF4F9A;  /* hồng lửa, dùng ở rìa gradient */
+  --core-gold:   #FFE2A8;  /* lõi ngọn lửa, điểm sáng nhất, dùng rất tiết kiệm */
+
+  /* Ánh xạ biến hệ thống */
+  --bg-main: var(--ash-black);
+  --bg-card: var(--char);
+  --text-main: var(--bone);
+  --text-muted: #A39686;
+  --text-light: #706456;
+  --border-color: rgba(90, 26, 30, 0.55);
+  --border-light: rgba(90, 26, 30, 0.3);
+  --primary: var(--crimson);
+  --primary-hover: var(--ember);
+  --primary-light: rgba(90, 26, 30, 0.35);
+  --primary-glow: rgba(255, 122, 43, 0.25);
+
+  /* Typography */
+  --font-heading: 'Barlow Condensed', sans-serif;
+  --font-body: 'Be Vietnam Pro', sans-serif;
+  --font-quote: 'Playfair Display', serif;
+
+  /* Form & Radii - sắc nét, góc vát gai góc */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* Shadows - ánh lửa âm ỉ */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.7);
+  --shadow-md: 0 10px 30px -5px rgba(0, 0, 0, 0.85), 0 0 15px rgba(90, 26, 30, 0.2);
+  --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 122, 43, 0.15);
+  --shadow-hover: 0 15px 35px -5px rgba(255, 122, 43, 0.25), 0 0 20px rgba(224, 48, 63, 0.2);
+}
+
+/* Visibility toggling for theme specific copywriting */
+.theme-rebirth-content {
+  display: none !important;
+}
+
+.theme-default-content {
+  display: inline;
+}
+
+div.theme-default-content,
+p.theme-default-content {
+  display: block;
+}
+
+[data-theme="rebirth"] .theme-default-content {
+  display: none !important;
+}
+
+[data-theme="rebirth"] .theme-rebirth-content {
+  display: inline !important;
+}
+
+[data-theme="rebirth"] div.theme-rebirth-content,
+[data-theme="rebirth"] p.theme-rebirth-content {
+  display: block !important;
+}
+
+[data-theme="rebirth"] .flame-divider {
+  display: block !important;
+}
+
+.flame-divider {
+  display: none;
+}
+
+/* ==========================================
+   2. GLOBAL THEME STYLING
+   ========================================== */
+[data-theme="rebirth"] body {
+  background-color: var(--ash-black) !important;
+  color: var(--bone) !important;
+  font-family: var(--font-body) !important;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(90, 26, 30, 0.18) 0%, transparent 60%),
+    radial-gradient(circle at 100% 100%, rgba(255, 122, 43, 0.05) 0%, transparent 50%) !important;
+  background-attachment: fixed !important;
+}
+
+[data-theme="rebirth"] h1, 
+[data-theme="rebirth"] h2, 
+[data-theme="rebirth"] h3, 
+[data-theme="rebirth"] h4 {
+  font-family: var(--font-heading) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  color: var(--bone);
+}
+
+/* Từ khóa bùng cháy gradient lửa */
+[data-theme="rebirth"] .fire-keyword,
+[data-theme="rebirth"] .gradient-text {
+  background: linear-gradient(135deg, var(--ember) 0%, var(--flare-pink) 50%, var(--core-gold) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: 0 0 20px rgba(255, 122, 43, 0.35) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Subpage Banners */
+[data-theme="rebirth"] section[style*="linear-gradient"],
+[data-theme="rebirth"] .subpage-hero {
+  background: radial-gradient(circle at 50% 20%, #1a1412 0%, #0b0908 100%) !important;
+  border-bottom: 1px solid var(--oxblood) !important;
+}
+
+/* ==========================================
+   3. HEADER & NAVIGATION
+   ========================================== */
+[data-theme="rebirth"] .header-nav {
+  background: rgba(11, 9, 8, 0.92) !important;
+  border-bottom: 1px solid var(--oxblood) !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="rebirth"] .brand-logo {
+  color: var(--bone) !important;
+}
+
+[data-theme="rebirth"] .brand-icon {
+  background: linear-gradient(135deg, var(--crimson) 0%, var(--ember) 100%) !important;
+  color: var(--core-gold) !important;
+  box-shadow: 0 0 15px rgba(255, 122, 43, 0.4) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+[data-theme="rebirth"] .brand-logo .highlight {
+  background: linear-gradient(135deg, var(--ember) 0%, var(--core-gold) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-theme="rebirth"] .nav-link {
+  color: var(--bone) !important;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+[data-theme="rebirth"] .nav-link:hover,
+[data-theme="rebirth"] .nav-link.active {
+  color: var(--core-gold) !important;
+  opacity: 1;
+}
+
+[data-theme="rebirth"] .nav-link.active::after {
+  background: linear-gradient(90deg, var(--crimson), var(--ember)) !important;
+  box-shadow: 0 0 8px var(--ember) !important;
+}
+
+/* Nút đăng tin tuyển dụng / CTA Header */
+[data-theme="rebirth"] .btn-post-job {
+  background: var(--crimson) !important;
+  color: var(--bone) !important;
+  border: 1px solid var(--ember) !important;
+  border-radius: var(--radius-sm) !important;
+  font-family: var(--font-heading) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  font-size: 1rem !important;
+  box-shadow: 0 0 15px rgba(224, 48, 63, 0.35) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-theme="rebirth"] .btn-post-job:hover {
+  background: linear-gradient(135deg, var(--ember) 0%, var(--core-gold) 100%) !important;
+  color: var(--ash-black) !important;
+  box-shadow: 0 0 25px rgba(255, 122, 43, 0.6) !important;
+  transform: translateY(-2px) !important;
+}
+
+[data-theme="rebirth"] .btn-login {
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  color: var(--bone) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+[data-theme="rebirth"] .btn-login:hover {
+  border-color: var(--ember) !important;
+  color: var(--core-gold) !important;
+}
+
+/* ==========================================
+   4. THEME TOGGLE SWITCH COMPONENT
+   ========================================== */
+.theme-switch-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 9999px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+[data-theme="rebirth"] .theme-switch-container {
+  background: var(--char);
+  border-color: var(--oxblood);
+  box-shadow: 0 0 12px rgba(255, 122, 43, 0.15);
+}
+
+.theme-toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: #cbd5e1;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+[data-theme="rebirth"] .theme-toggle-switch {
+  background: var(--oxblood);
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.theme-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #f59e0b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="rebirth"] .theme-toggle-knob {
+  transform: translateX(20px);
+  background: linear-gradient(135deg, var(--ember), var(--core-gold));
+  color: var(--ash-black);
+  box-shadow: 0 0 10px rgba(255, 122, 43, 0.8);
+}
+
+.theme-switch-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+[data-theme="rebirth"] .theme-switch-label {
+  color: var(--bone);
+}
+
+/* ==========================================
+   5. HERO SECTION: "TÀN TRO → BÙNG CHÁY"
+   ========================================== */
+[data-theme="rebirth"] .hero-section {
+  position: relative;
+  background: #0B0908 !important;
+  overflow: hidden;
+  border-bottom: 1px solid var(--oxblood);
+}
+
+/* Hiệu ứng chuyển từ xanh thép lạnh sang ấm áp 1.2s lúc tải trang */
+[data-theme="rebirth"] .hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 50% 30%, rgba(224, 48, 63, 0.22) 0%, rgba(90, 26, 30, 0.3) 45%, rgba(11, 9, 8, 0.95) 85%),
+    linear-gradient(180deg, rgba(11, 9, 8, 0.4) 0%, rgba(11, 9, 8, 1) 100%);
+  z-index: 1;
+  pointer-events: none;
+  animation: igniteHall 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Nền hero ấm dần lên một nấc khi focus que diêm tìm kiếm */
+[data-theme="rebirth"] .hero-section.hero-ignited::before {
+  background: 
+    radial-gradient(ellipse at 50% 40%, rgba(255, 122, 43, 0.35) 0%, rgba(224, 48, 63, 0.3) 50%, rgba(11, 9, 8, 0.95) 85%),
+    linear-gradient(180deg, rgba(11, 9, 8, 0.2) 0%, rgba(11, 9, 8, 1) 100%) !important;
+  transition: all 0.5s ease;
+}
+
+@keyframes igniteHall {
+  0% {
+    filter: hue-rotate(180deg) brightness(0.6) contrast(1.15);
+    opacity: 0.65;
+  }
+  100% {
+    filter: none;
+    opacity: 1;
+  }
+}
+
+/* Vignette 4 góc tối sẫm */
+[data-theme="rebirth"] .hero-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 120px 40px rgba(0, 0, 0, 0.95);
+  z-index: 2;
+  pointer-events: none;
+}
+
+[data-theme="rebirth"] .hero-content {
+  position: relative;
+  z-index: 5;
+}
+
+/* Badge trạng thái ngọn lửa ban sơ */
+[data-theme="rebirth"] .hero-badge {
+  background: rgba(90, 26, 30, 0.5) !important;
+  border: 1px solid var(--oxblood) !important;
+  color: var(--core-gold) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 0 12px rgba(90, 26, 30, 0.5) !important;
+}
+
+[data-theme="rebirth"] .hero-badge i {
+  color: var(--ember) !important;
+}
+
+/* Tiêu đề Hero Barlow Condensed */
+[data-theme="rebirth"] .hero-title {
+  font-family: var(--font-heading) !important;
+  font-size: 3.4rem !important;
+  font-weight: 900 !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0.03em !important;
+  color: var(--bone) !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="rebirth"] .hero-subtitle {
+  font-family: var(--font-quote) !important;
+  font-style: italic !important;
+  font-size: 1.15rem !important;
+  color: var(--bone) !important;
+  opacity: 0.9 !important;
+  max-width: 650px !important;
+  margin: 0 auto 36px !important;
+}
+
+/* Ô tìm kiếm: "Que diêm" */
+[data-theme="rebirth"] .search-box-wrapper {
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85), 0 0 10px rgba(90, 26, 30, 0.3) !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-theme="rebirth"] .search-box-wrapper:focus-within {
+  border-color: var(--ember) !important;
+  box-shadow: 0 0 25px rgba(255, 122, 43, 0.4), 0 0 4px var(--core-gold), 0 20px 45px rgba(0, 0, 0, 0.9) !important;
+  background: #201815 !important;
+}
+
+[data-theme="rebirth"] .search-field i {
+  color: var(--steel) !important;
+  transition: color 0.3s ease;
+}
+
+[data-theme="rebirth"] .search-box-wrapper:focus-within .search-field i {
+  color: var(--ember) !important;
+}
+
+[data-theme="rebirth"] .search-field input,
+[data-theme="rebirth"] .search-field select {
+  color: var(--bone) !important;
+  background: transparent !important;
+}
+
+[data-theme="rebirth"] .search-field select option {
+  background: var(--char) !important;
+  color: var(--bone) !important;
+}
+
+[data-theme="rebirth"] .search-field input::placeholder {
+  color: var(--text-light) !important;
+}
+
+/* Nút tìm việc: Que diêm đánh lửa */
+[data-theme="rebirth"] .btn-search {
+  background: var(--crimson) !important;
+  color: var(--bone) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: var(--radius-sm) !important;
+  font-family: var(--font-heading) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 0 15px rgba(224, 48, 63, 0.4) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-theme="rebirth"] .btn-search:hover {
+  background: linear-gradient(135deg, var(--ember) 0%, var(--core-gold) 100%) !important;
+  color: var(--ash-black) !important;
+  box-shadow: 0 0 30px rgba(255, 122, 43, 0.65) !important;
+  border-color: var(--core-gold) !important;
+}
+
+/* Chip xu hướng: Viền gai mảnh, hover sáng như đầu nến vừa châm */
+[data-theme="rebirth"] .quick-tags span {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="rebirth"] .tag-pill {
+  background: var(--char) !important;
+  color: var(--bone) !important;
+  border: 1px solid rgba(217, 207, 192, 0.2) !important;
+  border-radius: 2px !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.02em !important;
+  transition: all 0.25s ease !important;
+}
+
+[data-theme="rebirth"] .tag-pill:hover {
+  background: rgba(90, 26, 30, 0.4) !important;
+  border-color: var(--ember) !important;
+  color: var(--core-gold) !important;
+  box-shadow: 0 0 14px rgba(255, 122, 43, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* 3 Đốm than (Hero Stats Cards) */
+[data-theme="rebirth"] .hero-stats {
+  margin-top: 50px;
+}
+
+[data-theme="rebirth"] .stat-card {
+  position: relative;
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  overflow: hidden;
+}
+
+[data-theme="rebirth"] .stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 122, 43, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+[data-theme="rebirth"] .stat-card .stat-icon {
+  background: rgba(90, 26, 30, 0.6) !important;
+  color: var(--ember) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+[data-theme="rebirth"] .stat-card .stat-number {
+  font-family: var(--font-heading) !important;
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, var(--ember) 0%, var(--core-gold) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  letter-spacing: 0.02em !important;
+}
+
+[data-theme="rebirth"] .stat-card .stat-label {
+  color: var(--text-muted) !important;
+  font-size: 0.85rem !important;
+}
+
+/* ==========================================
+   6. SECTIONS & SECTION HEADERS
+   ========================================== */
+[data-theme="rebirth"] .section {
+  background: var(--ash-black) !important;
+  position: relative;
+}
+
+[data-theme="rebirth"] .section-alt {
+  background: #110E0C !important;
+  border-top: 1px solid rgba(90, 26, 30, 0.35) !important;
+  border-bottom: 1px solid rgba(90, 26, 30, 0.35) !important;
+}
+
+/* Vệt lửa ngăn cách giữa các section */
+[data-theme="rebirth"] .flame-divider {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent 0%, var(--oxblood) 20%, var(--ember) 50%, var(--core-gold) 70%, transparent 100%);
+  box-shadow: 0 0 10px rgba(255, 122, 43, 0.4);
+  margin: 0;
+  border: none;
+}
+
+[data-theme="rebirth"] .section-badge {
+  background: rgba(90, 26, 30, 0.4) !important;
+  color: var(--ember) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: 2px !important;
+  font-family: var(--font-heading) !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.08em !important;
+}
+
+[data-theme="rebirth"] .section-title {
+  color: var(--bone) !important;
+  font-size: 2.2rem !important;
+  letter-spacing: 0.04em !important;
+}
+
+[data-theme="rebirth"] .section-subtitle {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="rebirth"] .section-link {
+  color: var(--ember) !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="rebirth"] .section-link:hover {
+  color: var(--core-gold) !important;
+}
+
+/* Filter Tabs */
+[data-theme="rebirth"] .filter-tabs {
+  border-bottom: 1px solid var(--oxblood) !important;
+}
+
+[data-theme="rebirth"] .filter-tab {
+  color: var(--text-muted) !important;
+  font-family: var(--font-heading) !important;
+  font-size: 1.05rem !important;
+  letter-spacing: 0.04em !important;
+}
+
+[data-theme="rebirth"] .filter-tab:hover,
+[data-theme="rebirth"] .filter-tab.active {
+  color: var(--core-gold) !important;
+  border-bottom: 2px solid var(--ember) !important;
+  text-shadow: 0 0 10px rgba(255, 122, 43, 0.5) !important;
+}
+
+/* ==========================================
+   7. CATEGORY CARDS: "NGỌN NẾN"
+   ========================================== */
+[data-theme="rebirth"] .category-card {
+  position: relative;
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  overflow: hidden;
+}
+
+[data-theme="rebirth"] .category-card::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 5px;
+  height: 10px;
+  background: var(--steel);
+  border-radius: 50% 50% 20% 20%;
+  opacity: 0.35;
+  transition: all 0.35s ease;
+  transform-origin: bottom center;
+  z-index: 2;
+}
+
+[data-theme="rebirth"] .category-card:hover::before {
+  opacity: 1;
+  background: radial-gradient(ellipse at bottom, var(--core-gold) 0%, var(--ember) 60%, var(--crimson) 100%);
+  box-shadow: 0 0 10px var(--ember), 0 0 18px var(--core-gold);
+  transform: scale(1.6) translateY(-4px);
+  animation: candleFlicker 0.6s infinite alternate;
+}
+
+@keyframes candleFlicker {
+  0% { transform: scale(1.5) translateY(-4px) rotate(-3deg); }
+  100% { transform: scale(1.7) translateY(-5px) rotate(3deg); }
+}
+
+[data-theme="rebirth"] .category-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--oxblood);
+  transition: all 0.3s ease;
+}
+
+[data-theme="rebirth"] .category-card:hover {
+  border-color: var(--ember) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 122, 43, 0.25) !important;
+}
+
+[data-theme="rebirth"] .category-card:hover::after {
+  background: linear-gradient(90deg, var(--crimson), var(--ember), var(--core-gold));
+  box-shadow: 0 0 8px var(--ember);
+}
+
+[data-theme="rebirth"] .category-icon-box {
+  background: rgba(90, 26, 30, 0.5) !important;
+  color: var(--steel) !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all 0.3s ease !important;
+}
+
+[data-theme="rebirth"] .category-card:hover .category-icon-box {
+  background: var(--crimson) !important;
+  color: var(--core-gold) !important;
+  box-shadow: 0 0 16px rgba(255, 122, 43, 0.6) !important;
+  transform: scale(1.08);
+}
+
+[data-theme="rebirth"] .category-info h4 {
+  color: var(--bone) !important;
+  font-size: 1.15rem !important;
+}
+
+[data-theme="rebirth"] .category-card:hover .category-info h4 {
+  color: var(--core-gold) !important;
+}
+
+[data-theme="rebirth"] .category-info p {
+  color: var(--text-muted) !important;
+}
+
+/* ==========================================
+   8. JOB CARDS: "NẮP KHẮC VÁT GAI GÓC"
+   ========================================== */
+[data-theme="rebirth"] .job-card {
+  position: relative;
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  /* Vát cạnh 6px tạo nét gai góc */
+  clip-path: polygon(0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px));
+  box-shadow: var(--shadow-sm) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-theme="rebirth"] .job-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(to top, rgba(255, 122, 43, 0.06) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+[data-theme="rebirth"] .job-card:hover {
+  border-color: var(--ember) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 122, 43, 0.22) !important;
+}
+
+[data-theme="rebirth"] .job-card:hover::before {
+  opacity: 1;
+}
+
+[data-theme="rebirth"] .company-logo {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="rebirth"] .job-title {
+  color: var(--bone) !important;
+  font-size: 1.2rem !important;
+}
+
+[data-theme="rebirth"] .job-card:hover .job-title {
+  color: var(--core-gold) !important;
+}
+
+[data-theme="rebirth"] .company-name {
+  color: var(--text-muted) !important;
+}
+
+/* Badge Mức Lương: Điểm nhấn ánh kim lửa */
+[data-theme="rebirth"] .salary-badge {
+  background: rgba(90, 26, 30, 0.45) !important;
+  color: var(--core-gold) !important;
+  border: 1px solid var(--oxblood) !important;
+  font-weight: 700 !important;
+  border-radius: 2px !important;
+}
+
+[data-theme="rebirth"] .meta-item {
+  color: var(--text-muted) !important;
+}
+
+/* Thẻ Kỹ Năng: Viền gai mảnh */
+[data-theme="rebirth"] .job-tag {
+  background: rgba(26, 20, 18, 0.9) !important;
+  color: var(--bone) !important;
+  border: 1px solid rgba(217, 207, 192, 0.18) !important;
+  border-radius: 2px !important;
+  font-size: 0.78rem !important;
+}
+
+[data-theme="rebirth"] .job-card:hover .job-tag {
+  border-color: rgba(255, 122, 43, 0.4) !important;
+  color: var(--core-gold) !important;
+}
+
+[data-theme="rebirth"] .deadline-pill {
+  color: var(--text-muted) !important;
+}
+
+/* Chấm lửa nhấp nháy cho Đang Tuyển */
+[data-theme="rebirth"] .flame-dot-active {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--ember);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--core-gold);
+  animation: flamePulse 1.8s infinite ease-in-out;
+  margin-right: 6px;
+}
+
+[data-theme="rebirth"] .flame-dot-expired {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #524b45;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+@keyframes flamePulse {
+  0%, 100% {
+    box-shadow: 0 0 4px var(--ember);
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    box-shadow: 0 0 12px var(--core-gold), 0 0 4px var(--crimson);
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+[data-theme="rebirth"] .btn-apply-sm {
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  color: var(--bone) !important;
+  border-radius: 2px !important;
+  font-family: var(--font-heading) !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.04em !important;
+}
+
+[data-theme="rebirth"] .btn-apply-sm:hover {
+  background: var(--crimson) !important;
+  border-color: var(--ember) !important;
+  color: var(--core-gold) !important;
+  box-shadow: 0 0 15px rgba(255, 122, 43, 0.4) !important;
+}
+
+/* Feature Boxes */
+[data-theme="rebirth"] .feature-box {
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: all 0.35s ease !important;
+}
+
+[data-theme="rebirth"] .feature-box:hover {
+  border-color: var(--ember) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 122, 43, 0.25) !important;
+}
+
+[data-theme="rebirth"] .feature-icon-wrapper {
+  background: rgba(90, 26, 30, 0.5) !important;
+  color: var(--steel) !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all 0.3s ease !important;
+}
+
+[data-theme="rebirth"] .feature-box:hover .feature-icon-wrapper {
+  background: var(--crimson) !important;
+  color: var(--core-gold) !important;
+  box-shadow: 0 0 16px rgba(255, 122, 43, 0.6) !important;
+}
+
+[data-theme="rebirth"] .feature-title {
+  color: var(--bone) !important;
+  font-family: var(--font-heading) !important;
+  font-size: 1.25rem !important;
+  letter-spacing: 0.04em !important;
+}
+
+[data-theme="rebirth"] .feature-desc {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="rebirth"] .feature-desc code,
+[data-theme="rebirth"] .feature-desc em {
+  background: #120e0c !important;
+  color: var(--ember) !important;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(90, 26, 30, 0.5) !important;
+}
+
+/* ==========================================
+   9. TOP COMPANIES SECTION
+   ========================================== */
+[data-theme="rebirth"] .company-card {
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+[data-theme="rebirth"] .company-card:hover {
+  border-color: var(--ember) !important;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 122, 43, 0.2) !important;
+  transform: translateY(-4px);
+}
+
+[data-theme="rebirth"] .company-card-name {
+  color: var(--bone) !important;
+}
+
+[data-theme="rebirth"] .company-card-location {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="rebirth"] .company-open-jobs {
+  background: rgba(90, 26, 30, 0.45) !important;
+  color: var(--core-gold) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: 2px !important;
+}
+
+/* ==========================================
+   10. BOTTOM CTA: MẶT NƯỚC ĐEN & VỆT LỬA
+   ========================================== */
+[data-theme="rebirth"] .cta-banner {
+  position: relative;
+  background: radial-gradient(ellipse at 50% 120%, rgba(224, 48, 63, 0.3) 0%, rgba(11, 9, 8, 0.98) 75%) !important;
+  border: 1px solid var(--oxblood) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 122, 43, 0.3) !important;
+  overflow: hidden;
+  border-radius: var(--radius-md) !important;
+}
+
+/* Vệt nước phản chiếu ánh lửa bên dưới */
+[data-theme="rebirth"] .cta-banner::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45px;
+  background: linear-gradient(180deg, rgba(255, 122, 43, 0.15) 0%, rgba(11, 9, 8, 0.9) 100%);
+  border-top: 1px solid var(--ember);
+  box-shadow: 0 0 20px rgba(255, 122, 43, 0.4);
+  pointer-events: none;
+}
+
+[data-theme="rebirth"] .cta-banner .cta-quote {
+  font-family: var(--font-quote) !important;
+  font-style: italic !important;
+  font-size: 1.55rem !important;
+  color: var(--bone) !important;
+  margin-bottom: 8px;
+}
+
+[data-theme="rebirth"] .cta-banner h3 {
+  font-family: var(--font-heading) !important;
+  font-size: 2rem !important;
+  color: var(--bone) !important;
+  letter-spacing: 0.03em !important;
+}
+
+[data-theme="rebirth"] .btn-cta-white {
+  background: var(--crimson) !important;
+  color: var(--bone) !important;
+  border: 1px solid var(--ember) !important;
+  border-radius: var(--radius-sm) !important;
+  font-family: var(--font-heading) !important;
+  font-size: 1.05rem !important;
+  letter-spacing: 0.05em !important;
+  box-shadow: 0 0 20px rgba(224, 48, 63, 0.4) !important;
+}
+
+[data-theme="rebirth"] .btn-cta-white:hover {
+  background: linear-gradient(135deg, var(--ember) 0%, var(--core-gold) 100%) !important;
+  color: var(--ash-black) !important;
+  box-shadow: 0 0 35px rgba(255, 122, 43, 0.7) !important;
+}
+
+[data-theme="rebirth"] .btn-cta-outline {
+  background: transparent !important;
+  color: var(--bone) !important;
+  border: 1px solid var(--oxblood) !important;
+  border-radius: var(--radius-sm) !important;
+  font-family: var(--font-heading) !important;
+  font-size: 1.05rem !important;
+  letter-spacing: 0.05em !important;
+}
+
+[data-theme="rebirth"] .btn-cta-outline:hover {
+  border-color: var(--ember) !important;
+  color: var(--core-gold) !important;
+  background: rgba(90, 26, 30, 0.3) !important;
+}
+
+/* ==========================================
+   11. FOOTER
+   ========================================== */
+[data-theme="rebirth"] .footer {
+  background: #080605 !important;
+  border-top: 1px solid var(--oxblood) !important;
+}
+
+[data-theme="rebirth"] .footer-title {
+  color: var(--bone) !important;
+  font-family: var(--font-heading) !important;
+  font-size: 1.15rem !important;
+  letter-spacing: 0.05em !important;
+}
+
+[data-theme="rebirth"] .footer-desc,
+[data-theme="rebirth"] .footer-links a,
+[data-theme="rebirth"] .footer-contact-item {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="rebirth"] .footer-links a:hover {
+  color: var(--core-gold) !important;
+}
+
+[data-theme="rebirth"] .social-btn {
+  background: var(--char) !important;
+  border: 1px solid var(--oxblood) !important;
+  color: var(--bone) !important;
+}
+
+[data-theme="rebirth"] .social-btn:hover {
+  border-color: var(--ember) !important;
+  color: var(--core-gold) !important;
+  box-shadow: 0 0 10px rgba(255, 122, 43, 0.4) !important;
+}
+
+/* ==========================================
+   12. DASHBOARDS (EMPLOYER / CANDIDATE / ADMIN)
+   ========================================== */
+[data-theme="rebirth"] .employer-stat-card strong,
+[data-theme="rebirth"] .candidate-stat-card strong {
+  background: linear-gradient(135deg, var(--ember) 0%, var(--core-gold) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-family: var(--font-heading) !important;
+  font-size: 1.8rem !important;
+  letter-spacing: 0.02em !important;
+}
+
+[data-theme="rebirth"] .new-applicant-spark,
+[data-theme="rebirth"] .new-applicant-spark.active {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ember);
+  box-shadow: 0 0 10px var(--core-gold);
+  margin-right: 8px;
+  animation: flamePulse 1.4s infinite;
+}
+
+[data-theme="rebirth"] .new-applicant-spark.viewed {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #5a4b41;
+  box-shadow: none;
+  margin-right: 8px;
+  opacity: 0.45;
+  animation: none;
+}
+
+/* Status Badges */
+[data-theme="rebirth"] .badge-blue {
+  background: rgba(90, 26, 30, 0.4) !important;
+  color: var(--bone) !important;
+  border: 1px solid var(--oxblood) !important;
+}
+
+[data-theme="rebirth"] .badge-purple {
+  background: rgba(139, 92, 246, 0.2) !important;
+  color: #c4b5fd !important;
+  border: 1px solid rgba(139, 92, 246, 0.4) !important;
+}
+
+[data-theme="rebirth"] .badge-amber {
+  background: rgba(255, 122, 43, 0.2) !important;
+  color: var(--core-gold) !important;
+  border: 1px solid var(--ember) !important;
+}
+
+[data-theme="rebirth"] .badge-emerald {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #6ee7b7 !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+}
+
+[data-theme="rebirth"] .badge-rose {
+  background: rgba(224, 48, 63, 0.2) !important;
+  color: #fda4af !important;
+  border: 1px solid var(--crimson) !important;
+}
+
+/* Form Controls in Rebirth Mode */
+[data-theme="rebirth"] input,
+[data-theme="rebirth"] select,
+[data-theme="rebirth"] textarea {
+  background-color: #120e0c !important;
+  color: var(--bone) !important;
+  border-color: var(--oxblood) !important;
+}
+
+[data-theme="rebirth"] input:focus,
+[data-theme="rebirth"] select:focus,
+[data-theme="rebirth"] textarea:focus {
+  border-color: var(--ember) !important;
+  box-shadow: 0 0 10px rgba(255, 122, 43, 0.3) !important;
+}
+
+/* Tables in Rebirth Mode */
+[data-theme="rebirth"] table {
+  color: var(--bone) !important;
+}
+
+[data-theme="rebirth"] th {
+  background: rgba(26, 20, 18, 0.95) !important;
+  color: var(--steel) !important;
+  border-bottom: 2px solid var(--oxblood) !important;
+  font-family: var(--font-heading) !important;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+}
+
+[data-theme="rebirth"] td {
+  border-bottom: 1px solid rgba(90, 26, 30, 0.4) !important;
+  background: var(--char) !important;
+  color: var(--bone) !important;
+}
+
+[data-theme="rebirth"] tr:hover td {
+  background: rgba(90, 26, 30, 0.2) !important;
+}
+
+/* Modals in Rebirth Theme */
+[data-theme="rebirth"] #apply-modal {
+  background: rgba(11, 9, 8, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+[data-theme="rebirth"] #apply-modal > div {
+  background: var(--char) !important;
+  border-color: var(--oxblood) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.95), 0 0 20px rgba(224, 48, 63, 0.2) !important;
+}
+
+[data-theme="rebirth"] #apply-modal > div > div:first-child {
+  background: #140f0d !important;
+  border-bottom: 1px solid var(--oxblood) !important;
+}
+
+/* ==========================================
+   13. ACCESSIBILITY: PREFERS-REDUCED-MOTION
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="rebirth"] .hero-section::before,
+  [data-theme="rebirth"] .flame-dot-active,
+  [data-theme="rebirth"] .new-applicant-spark {
+    animation: none !important;
+  }
+  
+  [data-theme="rebirth"] * {
+    transition-duration: 0.01ms !important;
+  }
+}
