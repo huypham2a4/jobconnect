@@ -28,6 +28,11 @@
           <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Đã từ chối</option>
           <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Đã đóng</option>
         </select>
+
+        <button type="submit" class="btn-search" style="padding: 8px 14px; font-size: 0.85rem;">Tìm kiếm</button>
+        @if(request()->filled('q') || request()->filled('status'))
+          <a href="{{ route('admin.jobs.index') }}" class="btn-login" style="padding: 8px 12px; font-size: 0.82rem; border: 1px solid var(--border-color);">Xóa lọc</a>
+        @endif
       </form>
     </div>
 
@@ -54,6 +59,9 @@
                   <span style="font-size: 0.8rem; color: var(--text-muted);">
                     Đăng ngày {{ $job->created_at ? $job->created_at->format('d/m/Y') : '' }} • {{ $job->applications_count }} ứng viên
                   </span>
+                  @if($job->status === 'rejected' && $job->rejection_note)
+                    <div style="font-size: 0.78rem; color: #b91c1c; margin-top: 4px;">Lý do: {{ $job->rejection_note }}</div>
+                  @endif
                 </td>
 
                 <td style="padding: 16px; font-weight: 600; color: var(--text-main);">
@@ -70,7 +78,11 @@
                 </td>
 
                 <td style="padding: 16px; text-align: center;">
-                  @if($job->status === 'approved')
+                  @if($job->status === 'approved' && $job->is_expired)
+                    <span style="background: #fff1f2; color: #e11d48; border: 1px solid #fecaca; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700;">
+                      Đã duyệt · Quá hạn
+                    </span>
+                  @elseif($job->status === 'approved')
                     <span style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700;">
                       Đã duyệt
                     </span>
@@ -91,7 +103,7 @@
 
                 <td style="padding: 16px 20px; text-align: right;">
                   <div style="display: inline-flex; align-items: center; gap: 6px;">
-                    @if($job->status !== 'approved')
+                    @if(in_array($job->status, ['pending', 'rejected'], true))
                       <form action="{{ route('admin.jobs.approve', $job->id) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn-login" style="padding: 4px 10px; font-size: 0.8rem; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857;" title="Phê duyệt tin">
@@ -100,13 +112,10 @@
                       </form>
                     @endif
 
-                    @if($job->status !== 'rejected')
-                      <form action="{{ route('admin.jobs.reject', $job->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn-login" style="padding: 4px 10px; font-size: 0.8rem; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;" title="Từ chối tin">
-                          <i class="fa-solid fa-xmark"></i> Từ chối
-                        </button>
-                      </form>
+                    @if(in_array($job->status, ['pending', 'approved'], true))
+                      <button type="button" onclick="openRejectModal('{{ $job->id }}', '{{ addslashes($job->title) }}')" class="btn-login" style="padding: 4px 10px; font-size: 0.8rem; background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;" title="Từ chối tin">
+                        <i class="fa-solid fa-xmark"></i> Từ chối
+                      </button>
                     @endif
                   </div>
                 </td>
@@ -123,4 +132,41 @@
 
   </div>
 </section>
+
+<div id="reject-job-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+  <div style="background: var(--bg-card); border-radius: var(--radius-lg); width: 100%; max-width: 480px; margin: 20px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); overflow: hidden;">
+    <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0;">Từ Chối Tin Tuyển Dụng</h3>
+        <p id="reject-job-title" style="font-size: 0.84rem; color: var(--text-muted); margin: 2px 0 0;"></p>
+      </div>
+      <button type="button" onclick="closeRejectModal()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+    </div>
+    <form id="reject-job-form" method="POST" style="padding: 24px;">
+      @csrf
+      <div style="margin-bottom: 18px;">
+        <label for="rejection_note" style="display: block; font-weight: 600; font-size: 0.88rem; color: var(--text-main); margin-bottom: 8px;">Lý do từ chối (gửi thông báo cho nhà tuyển dụng)</label>
+        <textarea name="rejection_note" id="rejection_note" rows="3" maxlength="500" placeholder="Ví dụ: Vui lòng bổ sung mô tả yêu cầu công việc rõ ràng hơn..."
+                  style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.9rem; outline: none;"></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" onclick="closeRejectModal()" class="btn-login" style="padding: 8px 16px; border: 1px solid var(--border-color);">Hủy</button>
+        <button type="submit" class="btn-login" style="padding: 8px 18px; background: #dc2626; color: #ffffff; border: none; font-weight: 600;">Xác nhận từ chối</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openRejectModal(jobId, jobTitle) {
+  const form = document.getElementById('reject-job-form');
+  form.action = "{{ url('/admin/jobs') }}/" + jobId + "/reject";
+  document.getElementById('reject-job-title').innerText = jobTitle;
+  document.getElementById('rejection_note').value = '';
+  document.getElementById('reject-job-modal').style.display = 'flex';
+}
+function closeRejectModal() {
+  document.getElementById('reject-job-modal').style.display = 'none';
+}
+</script>
 @endsection

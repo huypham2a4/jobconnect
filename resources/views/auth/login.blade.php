@@ -15,27 +15,11 @@
         <p style="color: var(--text-muted); font-size: 0.95rem;">Đăng nhập để kết nối việc làm và quản lý tuyển dụng</p>
       </div>
 
-      @if(session('success'))
-        <div style="background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 0.9rem;">
-          <i class="fa-solid fa-circle-check" style="margin-right: 6px;"></i> {{ session('success') }}
-        </div>
-      @endif
+      
 
-      @if(session('error'))
-        <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 0.9rem;">
-          <i class="fa-solid fa-circle-exclamation" style="margin-right: 6px;"></i> {{ session('error') }}
-        </div>
-      @endif
+      
 
-      @if($errors->any())
-        <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 0.9rem;">
-          <ul style="list-style: none; margin: 0; padding: 0;">
-            @foreach($errors->all() as $err)
-              <li><i class="fa-solid fa-triangle-exclamation" style="margin-right: 6px;"></i> {{ $err }}</li>
-            @endforeach
-          </ul>
-        </div>
-      @endif
+      
 
       <form action="{{ route('login.post') }}" method="POST" id="form-login">
         @csrf
@@ -57,10 +41,10 @@
             <label for="password" style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">
               Mật khẩu
             </label>
-            <a href="#" style="font-size: 0.85rem; color: var(--primary); text-decoration: none;">Quên mật khẩu?</a>
+            <a href="{{ route('password.request') }}" style="font-size: 0.85rem; color: var(--primary); text-decoration: none;">Quên mật khẩu?</a>
           </div>
           <div style="position: relative;">
-            <i class="fa-solid fa-lock" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-light);"></i>
+            <i class="fa-solid fa-lock" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-light); z-index: 2;"></i>
             <input type="password" name="password" id="password" required placeholder="••••••••"
                    style="width: 100%; padding: 12px 16px 12px 42px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.95rem; outline: none; transition: var(--transition);"
                    onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border-color)'">
@@ -78,34 +62,45 @@
         </button>
       </form>
 
-      <!-- Quick Demo Accounts -->
-      <div style="margin-top: 28px; padding-top: 20px; border-top: 1px dashed var(--border-color);">
-        <p style="font-size: 0.82rem; color: var(--text-light); text-align: center; margin-bottom: 10px; font-weight: 600;">
-          TÀI KHOẢN TRẢI NGHIỆM NHANH (Bấm để tự điền):
-        </p>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button type="button" onclick="fillAccount('admin@jobconnect.vn', 'password')"
-                  style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; text-align: left; transition: var(--transition);"
-                  onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border-color)'">
-            <span><i class="fa-solid fa-shield-halved" style="color: #ef4444; margin-right: 6px;"></i> <strong>Admin:</strong> admin@jobconnect.vn</span>
-            <span style="color: var(--text-light); font-size: 0.78rem;">password</span>
+      <section class="demo-accounts" aria-labelledby="demo-accounts-title">
+        <h3 id="demo-accounts-title">Tài khoản trải nghiệm nhanh</h3>
+        <p class="demo-accounts-hint">Chọn vai trò để tự điền, rồi bấm Đăng nhập ngay.</p>
+
+        <div class="demo-accounts-list">
+          <button type="button" class="demo-account demo-account--admin" aria-pressed="false"
+                  onclick="fillAccount('admin@jobconnect.vn', 'password', this)">
+            <span class="demo-account-icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
+            <span class="demo-account-info">
+              <strong>Quản trị viên <span class="demo-account-tag">Admin</span></strong>
+              <span class="demo-account-email">admin@jobconnect.vn</span>
+            </span>
+            <i class="fa-solid fa-arrow-right demo-account-arrow" aria-hidden="true"></i>
           </button>
 
-          <button type="button" onclick="fillAccount('fpt@jobconnect.vn', 'password')"
-                  style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; text-align: left; transition: var(--transition);"
-                  onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border-color)'">
-            <span><i class="fa-solid fa-building" style="color: #2563eb; margin-right: 6px;"></i> <strong>Nhà tuyển dụng (FPT):</strong> fpt@jobconnect.vn</span>
-            <span style="color: var(--text-light); font-size: 0.78rem;">password</span>
+          <button type="button" class="demo-account demo-account--employer" aria-pressed="false"
+                  onclick="fillAccount('fpt@jobconnect.vn', 'password', this)">
+            <span class="demo-account-icon" aria-hidden="true"><i class="fa-solid fa-building"></i></span>
+            <span class="demo-account-info">
+              <strong>Nhà tuyển dụng <span class="demo-account-tag">FPT</span></strong>
+              <span class="demo-account-email">fpt@jobconnect.vn</span>
+            </span>
+            <i class="fa-solid fa-arrow-right demo-account-arrow" aria-hidden="true"></i>
           </button>
 
-          <button type="button" onclick="fillAccount('ungvien@jobconnect.vn', 'password')"
-                  style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; text-align: left; transition: var(--transition);"
-                  onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border-color)'">
-            <span><i class="fa-solid fa-user-graduate" style="color: #10b981; margin-right: 6px;"></i> <strong>Ứng viên (Nguyễn Văn An):</strong> ungvien@jobconnect.vn</span>
-            <span style="color: var(--text-light); font-size: 0.78rem;">password</span>
+          <button type="button" class="demo-account demo-account--candidate" aria-pressed="false"
+                  aria-label="Dùng tài khoản ứng viên Nguyễn Văn An, ungvien@jobconnect.vn"
+                  onclick="fillAccount('ungvien@jobconnect.vn', 'password', this)">
+            <span class="demo-account-icon" aria-hidden="true"><i class="fa-solid fa-user-graduate"></i></span>
+            <span class="demo-account-info">
+              <strong>Ứng viên</strong>
+              <span class="demo-account-email">ungvien@jobconnect.vn</span>
+            </span>
+            <i class="fa-solid fa-arrow-right demo-account-arrow" aria-hidden="true"></i>
           </button>
         </div>
-      </div>
+
+        <p class="demo-accounts-password"><span><i class="fa-solid fa-key" aria-hidden="true"></i> Mật khẩu chung</span><code>password</code></p>
+      </section>
 
       <div style="text-align: center; margin-top: 24px; font-size: 0.9rem; color: var(--text-muted);">
         Chưa có tài khoản? 
@@ -117,9 +112,12 @@
 </section>
 
 <script>
-function fillAccount(email, password) {
+function fillAccount(email, password, selectedButton) {
   document.getElementById('email').value = email;
   document.getElementById('password').value = password;
+  document.querySelectorAll('.demo-account').forEach(function (button) {
+    button.setAttribute('aria-pressed', button === selectedButton ? 'true' : 'false');
+  });
 }
 </script>
 @endsection

@@ -34,6 +34,10 @@
           <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Chưa phù hợp</option>
           <option value="withdrawn" {{ request('status') === 'withdrawn' ? 'selected' : '' }}>Đã rút hồ sơ</option>
         </select>
+
+        <a href="{{ route('employer.applications.export', array_filter(['job_id' => $job_id, 'status' => request('status')])) }}" class="btn-login" style="padding: 8px 14px; font-size: 0.85rem; border: 1px solid var(--border-color); display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-file-csv" style="color: #059669;"></i> Xuất CSV
+        </a>
       </form>
     </div>
 
@@ -62,9 +66,16 @@
                   {{ mb_substr($app->user->name, 0, 1) }}
                 </div>
                 <div>
-                  <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0 0 4px 0;">
-                    {{ $app->user->name }}
-                  </h3>
+                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px;">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0;">
+                      {{ $app->user->name }}
+                    </h3>
+                    @if($app->match_analysis && $app->match_analysis['total_required'] > 0)
+                      <span class="match-badge {{ $app->match_analysis['tier_class'] }}" title="Khớp {{ $app->match_analysis['matched']->count() }}/{{ $app->match_analysis['total_required'] }} kỹ năng yêu cầu">
+                        Khớp {{ $app->match_analysis['score'] }}% kỹ năng
+                      </span>
+                    @endif
+                  </div>
                   <div style="font-size: 0.88rem; color: var(--text-muted);">
                     Ứng tuyển vị trí: <a href="{{ route('jobs.show', $app->job_post_id) }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">{{ $app->jobPost->title }}</a>
                     • Nộp ngày {{ $app->applied_at ? $app->applied_at->format('d/m/Y H:i') : '' }}
@@ -74,20 +85,41 @@
 
               <!-- Status Action Form & Button -->
               <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <form action="{{ route('employer.applications.status', $app->id) }}" method="POST" style="display: inline;">
-                  @csrf
-                  <select name="status" onchange="this.form.submit()" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; background: #f8fafc; outline: none;">
-                    <option value="submitted" {{ $app->status === 'submitted' ? 'selected' : '' }}>Chưa duyệt</option>
-                    <option value="viewed" {{ $app->status === 'viewed' ? 'selected' : '' }}>Đã xem xét</option>
-                    <option value="interview" {{ $app->status === 'interview' ? 'selected' : '' }}>Mời phỏng vấn</option>
-                    <option value="accepted" {{ $app->status === 'accepted' ? 'selected' : '' }}>Trúng tuyển</option>
-                    <option value="rejected" {{ $app->status === 'rejected' ? 'selected' : '' }}>Chưa phù hợp</option>
-                  </select>
-                </form>
+                @if($app->status === 'withdrawn')
+                  <span class="job-tag badge-gray" style="font-size: 0.85rem; padding: 6px 14px; font-weight: 600;">
+                    <i class="fa-solid fa-ban" style="margin-right: 4px;"></i> Đã rút hồ sơ
+                  </span>
+                @else
+                  <form action="{{ route('employer.applications.status', $app->id) }}" method="POST" style="display: inline;">
+                    @csrf
+                    <select name="status" onchange="this.form.submit()" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; background: #f8fafc; outline: none;">
+                      @if($app->status === 'submitted')
+                        <option value="submitted" selected>Chưa duyệt</option>
+                      @endif
+                      <option value="viewed" {{ $app->status === 'viewed' ? 'selected' : '' }}>Đã xem xét</option>
+                      @if($app->interview)
+                        <option value="interview" {{ $app->status === 'interview' ? 'selected' : '' }}>Mời phỏng vấn</option>
+                      @endif
+                      <option value="accepted" {{ $app->status === 'accepted' ? 'selected' : '' }}>Trúng tuyển</option>
+                      <option value="rejected" {{ $app->status === 'rejected' ? 'selected' : '' }}>Chưa phù hợp</option>
+                    </select>
+                  </form>
 
-                <button type="button" onclick="openInterviewModal('{{ $app->id }}', '{{ addslashes($app->user->name) }}', '{{ addslashes($app->jobPost->title) }}')" class="btn-search" style="padding: 6px 14px; font-size: 0.82rem;">
-                  <i class="fa-solid fa-calendar-plus" style="margin-right: 4px;"></i> Lên lịch phỏng vấn
-                </button>
+                  @if(! in_array($app->status, ['accepted', 'rejected'], true))
+                  <button type="button"
+                          data-app-id="{{ $app->id }}"
+                          data-candidate-name="{{ $app->user->name }}"
+                          data-job-title="{{ $app->jobPost->title }}"
+                          data-interview-date="{{ $app->interview?->interview_date?->format('Y-m-d\TH:i') ?? '' }}"
+                          data-interview-type="{{ $app->interview?->interview_type ?? 'online' }}"
+                          data-interview-location="{{ $app->interview?->location_or_link ?? '' }}"
+                          data-interview-note="{{ $app->interview?->note ?? '' }}"
+                          onclick="openInterviewModalFromBtn(this)"
+                          class="btn-search" style="padding: 6px 14px; font-size: 0.82rem;">
+                    <i class="fa-solid fa-calendar-plus" style="margin-right: 4px;"></i> {{ $app->interview ? 'Cập nhật lịch PV' : 'Lên lịch phỏng vấn' }}
+                  </button>
+                  @endif
+                @endif
               </div>
             </div>
 
@@ -103,7 +135,7 @@
                 @else
                   <span style="color: #94a3b8; font-weight: 500;">
                     <i class="fa-solid fa-lock" style="color: #ef4444; margin-right: 6px;"></i>
-                    0987*** <span style="font-size: 0.75rem; color: #f59e0b;">(Duyệt để xem)</span>
+                    {{ $app->user->phone ? Str::mask($app->user->phone, '*', 3) : 'Chưa cập nhật' }} <span style="font-size: 0.75rem; color: #f59e0b;">(Duyệt để xem)</span>
                   </span>
                 @endif
               </div>
@@ -125,8 +157,10 @@
 
               <div>
                 <strong style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-bottom: 2px;">TỆP HỒ SƠ (CV):</strong>
-                @if($app->cv)
-                  <a href="{{ asset('storage/' . $app->cv->file_path) }}" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: none;">
+                @if($app->status === 'withdrawn')
+                  <span style="color: var(--text-muted);">Ứng viên đã rút hồ sơ</span>
+                @elseif($app->cv)
+                  <a href="{{ route('cvs.download', $app->cv->id) }}" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: none;">
                     <i class="fa-regular fa-file-pdf" style="margin-right: 4px;"></i> {{ $app->cv->title }}
                   </a>
                 @else
@@ -162,7 +196,7 @@
                   • <em>{{ $app->interview->location_or_link }}</em>
                 </div>
                 <span style="font-size: 0.8rem; background: #ffffff; padding: 2px 8px; border-radius: var(--radius-full); border: 1px solid #fef3c7;">
-                  {{ ucfirst($app->interview->status) }}
+                  {{ match($app->interview->status) { 'scheduled' => 'Đã lên lịch', 'completed' => 'Đã phỏng vấn', 'cancelled' => 'Đã hủy', default => $app->interview->status } }}
                 </span>
               </div>
             @endif
@@ -244,13 +278,29 @@
 </div>
 
 <script>
-function openInterviewModal(appId, candidateName, jobTitle) {
+function openInterviewModalFromBtn(btn) {
+  openInterviewModal(
+    btn.dataset.appId,
+    btn.dataset.candidateName,
+    btn.dataset.jobTitle,
+    btn.dataset.interviewDate || '',
+    btn.dataset.interviewType || 'online',
+    btn.dataset.interviewLocation || '',
+    btn.dataset.interviewNote || ''
+  );
+}
+
+function openInterviewModal(appId, candidateName, jobTitle, dateVal = '', typeVal = 'online', locVal = '', noteVal = '') {
   const modal = document.getElementById('interview-modal');
   const form = document.getElementById('interview-form');
   const modalTitle = document.getElementById('modal-candidate-name');
 
   form.action = "{{ url('/employer/applications') }}/" + appId + "/invite";
   modalTitle.innerText = "Ứng viên: " + candidateName + " • " + jobTitle;
+  document.getElementById('interview_date').value = dateVal;
+  document.getElementById('interview_type').value = typeVal;
+  document.getElementById('location_or_link').value = locVal;
+  document.getElementById('note').value = noteVal;
   modal.style.display = 'flex';
 }
 

@@ -7,7 +7,6 @@ use App\Models\Company;
 use App\Models\JobPost;
 use App\Models\Location;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -17,9 +16,9 @@ class HomeController extends Controller
 
         // Thống kê thật từ Database
         $stats = [
-            'jobs_count' => number_format(JobPost::active()->count()) . '+',
-            'companies_count' => number_format(Company::count()) . '+',
-            'resumes_count' => number_format(User::where('role', 'candidate')->count()) . '+',
+            'jobs_count' => number_format(JobPost::active()->count()),
+            'companies_count' => number_format(Company::count()),
+            'resumes_count' => number_format(User::where('role', 'candidate')->count()),
         ];
 
         // Danh mục ngành nghề kèm số lượng việc làm
@@ -49,7 +48,7 @@ class HomeController extends Controller
             $compName = $job->company ? $job->company->name : 'Doanh nghiệp';
             $words = explode(' ', $compName);
             $shortName = count($words) > 1
-                ? mb_strtoupper(mb_substr($words[0], 0, 1) . mb_substr($words[1], 0, 1))
+                ? mb_strtoupper(mb_substr($words[0], 0, 1).mb_substr($words[1], 0, 1))
                 : mb_strtoupper(mb_substr($compName, 0, 2));
 
             return [
@@ -80,11 +79,13 @@ class HomeController extends Controller
         $topCompanies = $companiesFromDb->map(function ($comp, $index) use ($colors) {
             $words = explode(' ', $comp->name);
             $shortName = count($words) > 1
-                ? mb_strtoupper(mb_substr($words[0], 0, 1) . mb_substr($words[1], 0, 1))
+                ? mb_strtoupper(mb_substr($words[0], 0, 1).mb_substr($words[1], 0, 1))
                 : mb_strtoupper(mb_substr($comp->name, 0, 2));
 
             return [
                 'name' => $comp->name,
+                'slug' => $comp->slug,
+                'is_verified' => (bool) $comp->is_verified,
                 'avatar' => $shortName,
                 'color' => $colors[$index % count($colors)],
                 'location' => $comp->city ?? $comp->address ?? 'Toàn quốc',
@@ -92,7 +93,7 @@ class HomeController extends Controller
             ];
         });
 
-        $locations = Location::all();
+        $locations = Location::orderedForSelect();
 
         return view('home', compact('stats', 'categories', 'featuredJobs', 'topCompanies', 'locations'));
     }

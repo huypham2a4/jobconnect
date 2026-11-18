@@ -51,8 +51,13 @@
                       {{ $job->title }}
                     </a>
                     <span style="font-size: 0.8rem; color: var(--text-light);">
-                      Hình thức: {{ ucfirst($job->type) }}
+                      Hình thức: {{ $job->type_label }}
                     </span>
+                    @if($job->status === 'rejected' && $job->rejection_note)
+                      <div style="margin-top: 6px; font-size: 0.78rem; color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; padding: 4px 8px; border-radius: 6px;">
+                        <strong>Lý do từ chối:</strong> {{ $job->rejection_note }}
+                      </div>
+                    @endif
                   </td>
 
                   <td style="padding: 16px;">
@@ -77,7 +82,11 @@
                   </td>
 
                   <td style="padding: 16px; text-align: center;">
-                    @if($job->status === 'approved')
+                    @if($job->status === 'approved' && $job->is_expired)
+                      <span style="background: #fff1f2; color: #e11d48; border: 1px solid #fecaca; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700;">
+                        Quá hạn
+                      </span>
+                    @elseif($job->status === 'approved')
                       <span style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700;">
                         Đang tuyển
                       </span>
@@ -85,10 +94,12 @@
                       <span style="background: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700;">
                         Đã đóng
                       </span>
-                    @else
+                    @elseif($job->status === 'pending')
                       <span style="background: #fffbeb; color: #d97706; border: 1px solid #fde68a; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.78rem; font-weight: 700;">
                         Chờ duyệt
                       </span>
+                    @else
+                      <span class="status-rejected">Đã từ chối</span>
                     @endif
                   </td>
 
@@ -98,12 +109,14 @@
                         <i class="fa-solid fa-pen-to-square"></i> Sửa
                       </a>
 
+                      @if(in_array($job->status, ['approved', 'closed']))
                       <form action="{{ route('employer.jobs.toggle', $job->id) }}" method="POST" style="display: inline;">
                         @csrf
                         <button type="submit" class="btn-login" style="padding: 6px 12px; font-size: 0.82rem; background: #f8fafc; border: 1px solid var(--border-color); color: {{ $job->status === 'closed' ? '#059669' : '#dc2626' }};" title="{{ $job->status === 'closed' ? 'Mở lại tin' : 'Đóng tin' }}">
                           {{ $job->status === 'closed' ? 'Mở lại' : 'Đóng tin' }}
                         </button>
                       </form>
+                      @endif
 
                       <!-- Nút Gia hạn tin tuyển dụng -->
                       <form action="{{ route('employer.jobs.renew', $job->id) }}" method="POST" style="display: inline;">
@@ -113,6 +126,16 @@
                           <i class="fa-solid fa-clock-rotate-left"></i> Gia hạn
                         </button>
                       </form>
+
+                      @if($job->applications_count === 0)
+                        <form action="{{ route('employer.jobs.destroy', $job->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tin tuyển dụng này?')">
+                          @csrf
+                          @method('DELETE')
+                          <button type="submit" class="btn-login" style="padding: 6px 12px; font-size: 0.82rem; background: #fff1f2; border: 1px solid #fecaca; color: #e11d48;" title="Xóa tin tuyển dụng">
+                            <i class="fa-solid fa-trash-can"></i> Xóa
+                          </button>
+                        </form>
+                      @endif
                     </div>
                   </td>
                 </tr>

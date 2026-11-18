@@ -8,10 +8,15 @@ use App\Models\Cv;
 use App\Models\JobPost;
 use App\Models\Location;
 use App\Models\Skill;
+use App\Models\User;
+use App\Models\UserNotification;
+use App\Services\JobMatchingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class JobController extends Controller
 {
@@ -59,20 +64,31 @@ class JobController extends Controller
             $query->where('type', $request->type);
         }
 
-        // 5. Lọc theo Mức lương
+        // 4b. Lọc theo Kinh nghiệm
+        if ($request->filled('experience_level')) {
+            $query->where('experience_level', $request->experience_level);
+        }
+
+        // 5. Lọc theo Mức lương (hỗ trợ giao thoa khoảng lương min - max)
         if ($request->filled('salary_range')) {
             switch ($request->salary_range) {
                 case 'under_15':
-                    $query->where('salary_max', '<=', 15000000);
+                    $query->where('salary_negotiable', false)
+                        ->whereRaw('COALESCE(salary_min, salary_max) <= ?', [15000000]);
                     break;
                 case '15_25':
-                    $query->where('salary_min', '>=', 15000000)->where('salary_max', '<=', 25000000);
+                    $query->where('salary_negotiable', false)
+                        ->whereRaw('COALESCE(salary_max, salary_min) >= ?', [15000000])
+                        ->whereRaw('COALESCE(salary_min, salary_max) <= ?', [25000000]);
                     break;
                 case '25_40':
-                    $query->where('salary_min', '>=', 25000000)->where('salary_max', '<=', 40000000);
+                    $query->where('salary_negotiable', false)
+                        ->whereRaw('COALESCE(salary_max, salary_min) >= ?', [25000000])
+                        ->whereRaw('COALESCE(salary_min, salary_max) <= ?', [40000000]);
                     break;
                 case 'above_40':
-                    $query->where('salary_min', '>=', 40000000);
+                    $query->where('salary_negotiable', false)
+                        ->whereRaw('COALESCE(salary_max, salary_min) >= ?', [40000000]);
                     break;
                 case 'negotiable':
                     $query->where('salary_negotiable', true);
@@ -94,7 +110,7 @@ class JobController extends Controller
         $categories = Category::withCount(['jobPosts' => function ($q) {
             $q->active();
         }])->get();
-        $locations = Location::all();
+        $locations = Location::orderedForSelect();
         $skills = Skill::all();
 
         return view('jobs.index', compact('jobs', 'categories', 'locations', 'skills'));
@@ -103,12 +119,20 @@ class JobController extends Controller
     /**
      * Chi tiết tin tuyển dụng
      */
-    public function show($id)
+    public function show($id, JobMatchingService $matcher)
     {
         $job = JobPost::with(['company.user', 'category', 'location', 'skills'])->findOrFail($id);
 
-        // Tăng lượt xem
-        $job->increment('views_count');
+        $isPreviewer = Auth::check() && (Auth::user()->isAdmin() || $job->company?->user_id === Auth::id());
+
+        if ($job->status !== 'approved' || $job->is_expired) {
+            abort_unless($isPreviewer, 404);
+        }
+
+        // Tăng lượt xem (không tính lượt Admin hoặc chính nhà tuyển dụng xem trước tin của mình)
+        if (! $isPreviewer) {
+            $job->increment('views_count');
+        }
 
         // Việc làm liên quan cùng ngành nghề
         $relatedJobs = JobPost::with(['company', 'location'])
@@ -118,17 +142,20 @@ class JobController extends Controller
             ->take(3)
             ->get();
 
-        // Kiểm tra xem ứng viên đã ứng tuyển chưa
+        // Kiểm tra xem ứng viên đã ứng tuyển chưa + Phân tích độ phù hợp kỹ năng
         $hasApplied = false;
         $userCvs = collect();
+        $matchAnalysis = null;
         if (Auth::check() && Auth::user()->isCandidate()) {
             $hasApplied = Application::where('job_post_id', $job->id)
                 ->where('user_id', Auth::id())
+                ->where('applied_at', '>=', now()->subMonths(6))
                 ->exists();
             $userCvs = Cv::where('user_id', Auth::id())->get();
+            $matchAnalysis = $matcher->analyze(Auth::user(), $job);
         }
 
-        return view('jobs.show', compact('job', 'relatedJobs', 'hasApplied', 'userCvs'));
+        return view('jobs.show', compact('job', 'relatedJobs', 'hasApplied', 'userCvs', 'matchAnalysis'));
     }
 
     /**
@@ -136,12 +163,12 @@ class JobController extends Controller
      */
     public function apply(Request $request, $id)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return redirect()->route('login')->with('error', 'Vui lòng đăng nhập với tài khoản Ứng viên để nộp hồ sơ.');
         }
 
         $user = Auth::user();
-        if (!$user->isCandidate()) {
+        if (! $user->isCandidate()) {
             return back()->with('error', 'Chỉ tài khoản Ứng viên mới có thể nộp hồ sơ ứng tuyển.');
         }
 
@@ -161,7 +188,7 @@ class JobController extends Controller
         $request->validate([
             'cv_option' => ['required', 'in:existing,new'],
             'cover_letter' => ['nullable', 'string', 'max:2000'],
-            'existing_cv_id' => ['required_if:cv_option,existing', 'nullable', 'exists:cvs,id'],
+            'existing_cv_id' => ['required_if:cv_option,existing', 'nullable', Rule::exists('cvs', 'id')->where('user_id', $user->id)],
             'cv_file' => ['required_if:cv_option,new', 'nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
         ], [
             'existing_cv_id.required_if' => 'Vui lòng chọn một CV đã có trong tài khoản.',
@@ -170,36 +197,51 @@ class JobController extends Controller
             'cv_file.max' => 'Dung lượng tệp CV không được vượt quá 5MB.',
         ]);
 
-        $cvId = null;
+        return DB::transaction(function () use ($request, $user, $job) {
+            User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            if (Application::where('job_post_id', $job->id)->where('user_id', $user->id)->where('applied_at', '>=', now()->subMonths(6))->exists()) {
+                return back()->with('error', 'Bạn đã ứng tuyển vị trí này trong 6 tháng gần nhất.');
+            }
+            $cvId = null;
 
-        if ($request->cv_option === 'existing') {
-            $cvId = $request->existing_cv_id;
-        } else {
-            // Tải lên CV mới
-            $file = $request->file('cv_file');
-            $filename = 'cv_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('cvs', $filename, 'public');
+            if ($request->cv_option === 'existing') {
+                $cvId = $request->existing_cv_id;
+            } else {
+                // Tải lên CV mới
+                $file = $request->file('cv_file');
+                $filename = 'cv_'.$user->id.'_'.Str::uuid().'.'.$file->getClientOriginalExtension();
+                $path = $file->storeAs('cvs', $filename, 'public');
 
-            $cv = Cv::create([
+                $cv = Cv::create([
+                    'user_id' => $user->id,
+                    'title' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'is_primary' => ! Cv::where('user_id', $user->id)->exists(),
+                ]);
+
+                $cvId = $cv->id;
+            }
+
+            Application::create([
+                'job_post_id' => $job->id,
                 'user_id' => $user->id,
-                'title' => $file->getClientOriginalName(),
-                'file_path' => $path,
-                'file_type' => $file->getClientOriginalExtension(),
-                'is_primary' => !Cv::where('user_id', $user->id)->exists(),
+                'cv_id' => $cvId,
+                'cover_letter' => $request->cover_letter,
+                'status' => 'submitted',
+                'applied_at' => Carbon::now(),
             ]);
 
-            $cvId = $cv->id;
-        }
+            $job->loadMissing('company');
+            UserNotification::notifyUser(
+                $job->company?->user_id,
+                'application_submitted',
+                'Có hồ sơ ứng tuyển mới',
+                "{$user->name} vừa nộp hồ sơ vào vị trí \"{$job->title}\".",
+                route('employer.applications', ['job_id' => $job->id])
+            );
 
-        Application::create([
-            'job_post_id' => $job->id,
-            'user_id' => $user->id,
-            'cv_id' => $cvId,
-            'cover_letter' => $request->cover_letter,
-            'status' => 'submitted',
-            'applied_at' => Carbon::now(),
-        ]);
-
-        return back()->with('success', 'Chúc mừng! Hồ sơ của bạn đã được gửi thành công đến nhà tuyển dụng.');
+            return back()->with('success', 'Chúc mừng! Hồ sơ của bạn đã được gửi thành công đến nhà tuyển dụng.');
+        });
     }
 }

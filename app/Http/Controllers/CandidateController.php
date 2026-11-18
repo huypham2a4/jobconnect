@@ -5,17 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Application;
 use App\Models\Cv;
 use App\Models\Skill;
-use App\Models\User;
+use App\Services\JobMatchingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CandidateController extends Controller
 {
     /**
      * Dashboard tổng quan của Ứng viên
      */
-    public function dashboard()
+    public function dashboard(JobMatchingService $matcher)
     {
         $user = Auth::user();
         $applications = Application::with(['jobPost.company', 'interview'])
@@ -33,8 +34,9 @@ class CandidateController extends Controller
 
         $userSkills = $user->skills;
         $primaryCv = $user->primaryCv;
+        $recommendedJobs = $matcher->recommendForCandidate($user, 4);
 
-        return view('candidate.dashboard', compact('user', 'applications', 'stats', 'userSkills', 'primaryCv'));
+        return view('candidate.dashboard', compact('user', 'applications', 'stats', 'userSkills', 'primaryCv', 'recommendedJobs'));
     }
 
     /**
@@ -59,7 +61,7 @@ class CandidateController extends Controller
     {
         $application = Application::where('user_id', Auth::id())->findOrFail($id);
 
-        if (!$application->canWithdraw()) {
+        if (! $application->canWithdraw()) {
             return back()->with('error', 'Không thể rút hồ sơ: Nhà tuyển dụng đã tiếp nhận xử lý hồ sơ này.');
         }
 
@@ -77,6 +79,7 @@ class CandidateController extends Controller
     {
         $user = Auth::user();
         $cvs = Cv::where('user_id', $user->id)->latest()->get();
+
         return view('candidate.cvs', compact('cvs'));
     }
 
@@ -96,10 +99,10 @@ class CandidateController extends Controller
         ]);
 
         $file = $request->file('cv_file');
-        $filename = 'cv_' . Auth::id() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $filename = 'cv_'.Auth::id().'_'.Str::uuid().'.'.$file->getClientOriginalExtension();
         $path = $file->storeAs('cvs', $filename, 'public');
 
-        $isFirst = !Cv::where('user_id', Auth::id())->exists();
+        $isFirst = ! Cv::where('user_id', Auth::id())->exists();
 
         Cv::create([
             'user_id' => Auth::id(),
@@ -139,11 +142,19 @@ class CandidateController extends Controller
     {
         $cv = Cv::where('user_id', Auth::id())->findOrFail($id);
 
+        if ($cv->applications()->exists()) {
+            return back()->with('error', 'CV đang gắn với hồ sơ ứng tuyển. Hãy giữ lại để nhà tuyển dụng xem.');
+        }
+
         if ($cv->file_path && Storage::disk('public')->exists($cv->file_path)) {
             Storage::disk('public')->delete($cv->file_path);
         }
 
         $cv->delete();
+
+        if ($cv->is_primary) {
+            Cv::where('user_id', Auth::id())->oldest('id')->first()?->update(['is_primary' => true]);
+        }
 
         return back()->with('success', 'Đã xóa CV thành công.');
     }
@@ -153,8 +164,9 @@ class CandidateController extends Controller
      */
     public function setPrimaryCv($id)
     {
+        $cv = Cv::where('user_id', Auth::id())->findOrFail($id);
         Cv::where('user_id', Auth::id())->update(['is_primary' => false]);
-        Cv::where('user_id', Auth::id())->where('id', $id)->update(['is_primary' => true]);
+        $cv->update(['is_primary' => true]);
 
         return back()->with('success', 'Đã đặt hồ sơ này làm CV mặc định.');
     }
@@ -190,8 +202,8 @@ class CandidateController extends Controller
 
         $user->update([
             'name' => $validated['name'],
-            'phone' => $validated['phone'],
-            'bio' => $validated['bio'],
+            'phone' => $validated['phone'] ?? null,
+            'bio' => $validated['bio'] ?? null,
         ]);
 
         // Cập nhật kỹ năng ứng viên

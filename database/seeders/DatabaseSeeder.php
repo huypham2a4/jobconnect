@@ -196,25 +196,15 @@ class DatabaseSeeder extends Seeder
             $categories[$cat['slug']] = Category::create($cat);
         }
 
-        // 6. Tạo Địa điểm (Locations)
-        $locationsData = [
-            ['name' => 'TP. Hồ Chí Minh', 'slug' => 'hcm'],
-            ['name' => 'Hà Nội', 'slug' => 'hn'],
-            ['name' => 'Đà Nẵng', 'slug' => 'dn'],
-            ['name' => 'Cần Thơ', 'slug' => 'can-tho'],
-            ['name' => 'Làm việc từ xa (Remote)', 'slug' => 'remote'],
-        ];
-
-        $locations = [];
-        foreach ($locationsData as $loc) {
-            $locations[$loc['slug']] = Location::create($loc);
-        }
+        // 6. Tạo Địa điểm (Locations): 34 tỉnh thành + "Làm việc từ xa"
+        Location::syncProvinces();
+        $locations = Location::all()->keyBy('slug');
 
         // 7. Tạo Kỹ năng (Skills)
         $skillsData = [
             'PHP', 'Laravel 12', 'MySQL', 'REST API', 'Docker', 'Vue.js', 'ReactJS',
             'TypeScript', 'TailwindCSS', 'Figma', 'UI/UX', 'SEO', 'Google Ads',
-            'Python', 'AWS', 'Git', 'Agile/Scrum', 'Data Analytics', 'Kế toán thuế', 'B2B Sales'
+            'Python', 'AWS', 'Git', 'Agile/Scrum', 'Data Analytics', 'Kế toán thuế', 'B2B Sales',
         ];
 
         $skills = [];
@@ -417,7 +407,7 @@ class DatabaseSeeder extends Seeder
             $jobPost = JobPost::create($jobData);
             $createdJobPosts[] = $jobPost;
 
-            if (!empty($skillsToSync)) {
+            if (! empty($skillsToSync)) {
                 $skillIds = [];
                 foreach ($skillsToSync as $sName) {
                     if (isset($skills[$sName])) {
@@ -468,5 +458,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'submitted',
             'applied_at' => Carbon::now()->subHours(5),
         ]);
+        $this->call(DemoCvSeeder::class);
+        $this->call(RolePermissionSeeder::class);
     }
 }

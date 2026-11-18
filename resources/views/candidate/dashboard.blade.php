@@ -169,12 +169,17 @@
           </div>
 
           @if($primaryCv)
-            <div style="padding: 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; gap: 10px;">
-              <i class="fa-solid fa-file-pdf" style="font-size: 1.6rem; color: #ef4444;"></i>
-              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <strong style="font-size: 0.9rem; color: var(--text-main); display: block;">{{ $primaryCv->title }}</strong>
-                <span style="font-size: 0.78rem; color: var(--text-muted);">Đã sẵn sàng để nộp nhanh</span>
+            <div style="padding: 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                <i class="fa-solid fa-file-pdf" style="font-size: 1.6rem; color: #ef4444; flex-shrink: 0;"></i>
+                <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <strong style="font-size: 0.9rem; color: var(--text-main); display: block; overflow: hidden; text-overflow: ellipsis;">{{ $primaryCv->title }}</strong>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">Đã sẵn sàng để nộp nhanh</span>
+                </div>
               </div>
+              <a href="{{ route('cvs.download', $primaryCv->id) }}" target="_blank" style="font-size: 0.8rem; color: var(--primary); font-weight: 600; white-space: nowrap; text-decoration: none;" title="Xem CV mặc định">
+                <i class="fa-solid fa-eye"></i> Xem
+              </a>
             </div>
           @else
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Bạn chưa có CV mặc định.</p>
@@ -184,6 +189,47 @@
 
       </div>
 
+    </div>
+
+    <!-- Recommended Jobs Based on Skills -->
+    <div style="margin-top: 28px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary); margin-right: 8px;"></i> Việc Làm Gợi Ý Theo Kỹ Năng
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 4px 0 0;">Đối sánh tự động từ bộ kỹ năng chuyên môn trong hồ sơ của bạn.</p>
+        </div>
+        <a href="{{ route('jobs.index') }}" style="font-size: 0.88rem; color: var(--primary); font-weight: 600;">Khám phá tất cả <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+
+      @if($recommendedJobs->isEmpty())
+        <div style="padding: 24px; text-align: center; color: var(--text-muted);">
+          <p style="margin-bottom: 12px;">Hãy cập nhật kỹ năng chuyên môn để nhận gợi ý việc làm phù hợp nhất với bạn.</p>
+          <a href="{{ route('candidate.profile') }}" class="btn-apply-sm" style="display: inline-flex; padding: 8px 16px;">Cập nhật kỹ năng ngay <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      @else
+        <div class="recommended-jobs-grid">
+          @foreach($recommendedJobs as $rec)
+            @php $rJob = $rec['job']; $rMatch = $rec['analysis']; @endphp
+            <div class="recommended-job-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
+                <a href="{{ route('jobs.show', $rJob->id) }}" style="font-weight: 700; color: var(--text-main); font-size: 0.98rem; line-height: 1.4;">{{ $rJob->title }}</a>
+                <span class="match-badge {{ $rMatch['tier_class'] }}">{{ $rMatch['score'] }}% hợp</span>
+              </div>
+              <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0 0 10px;">
+                {{ $rJob->company?->name }} · {{ $rJob->location?->name ?? 'Toàn quốc' }} · <strong style="color:#059669;">{{ $rJob->salary_text }}</strong>
+              </p>
+              <div class="skill-pill-row" style="margin-bottom: 12px;">
+                @foreach($rMatch['matched']->take(4) as $mSkill)
+                  <span class="skill-pill is-matched"><i class="fa-solid fa-check"></i> {{ $mSkill->name }}</span>
+                @endforeach
+              </div>
+              <a href="{{ route('jobs.show', $rJob->id) }}" class="btn-apply-sm">Xem & Ứng tuyển <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          @endforeach
+        </div>
+      @endif
     </div>
 
   </div>

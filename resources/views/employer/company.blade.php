@@ -34,12 +34,17 @@
             <label for="city" style="display: block; font-weight: 600; font-size: 0.9rem; color: var(--text-main); margin-bottom: 8px;">
               Tỉnh / Thành phố <span style="color: #ef4444;">*</span>
             </label>
+            @php
+              $cityOptions = config('provinces');
+              $currentCity = old('city', $company->city);
+              if ($currentCity && !in_array($currentCity, $cityOptions, true)) {
+                array_unshift($cityOptions, $currentCity);
+              }
+            @endphp
             <select name="city" id="city" required style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.92rem; outline: none; background: #ffffff;">
-              <option value="TP. Hồ Chí Minh" {{ old('city', $company->city) === 'TP. Hồ Chí Minh' ? 'selected' : '' }}>TP. Hồ Chí Minh</option>
-              <option value="Hà Nội" {{ old('city', $company->city) === 'Hà Nội' ? 'selected' : '' }}>Hà Nội</option>
-              <option value="Đà Nẵng" {{ old('city', $company->city) === 'Đà Nẵng' ? 'selected' : '' }}>Đà Nẵng</option>
-              <option value="Cần Thơ" {{ old('city', $company->city) === 'Cần Thơ' ? 'selected' : '' }}>Cần Thơ</option>
-              <option value="Khác" {{ old('city', $company->city) === 'Khác' ? 'selected' : '' }}>Khác</option>
+              @foreach($cityOptions as $cityOpt)
+                <option value="{{ $cityOpt }}" {{ $currentCity === $cityOpt ? 'selected' : '' }}>{{ $cityOpt }}</option>
+              @endforeach
             </select>
           </div>
 
@@ -47,12 +52,23 @@
             <label for="size" style="display: block; font-weight: 600; font-size: 0.9rem; color: var(--text-main); margin-bottom: 8px;">
               Quy mô nhân sự
             </label>
+            @php
+              $sizeOptions = [
+                '10-50 nhân viên' => '10 - 50 nhân viên',
+                '50-100 nhân viên' => '50 - 100 nhân viên',
+                '100-500 nhân viên' => '100 - 500 nhân viên',
+                '500-1000 nhân viên' => '500 - 1000 nhân viên',
+                '1000+ nhân viên' => '1000+ nhân viên',
+              ];
+              $currentSize = old('size', $company->size);
+              if ($currentSize && !array_key_exists($currentSize, $sizeOptions)) {
+                $sizeOptions = [$currentSize => $currentSize] + $sizeOptions;
+              }
+            @endphp
             <select name="size" id="size" style="width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.92rem; outline: none; background: #ffffff;">
-              <option value="10-50 nhân viên" {{ old('size', $company->size) === '10-50 nhân viên' ? 'selected' : '' }}>10 - 50 nhân viên</option>
-              <option value="50-100 nhân viên" {{ old('size', $company->size) === '50-100 nhân viên' ? 'selected' : '' }}>50 - 100 nhân viên</option>
-              <option value="100-500 nhân viên" {{ old('size', $company->size) === '100-500 nhân viên' ? 'selected' : '' }}>100 - 500 nhân viên</option>
-              <option value="500-1000 nhân viên" {{ old('size', $company->size) === '500-1000 nhân viên' ? 'selected' : '' }}>500 - 1000 nhân viên</option>
-              <option value="1000+ nhân viên" {{ old('size', $company->size) === '1000+ nhân viên' ? 'selected' : '' }}>1000+ nhân viên</option>
+              @foreach($sizeOptions as $sizeVal => $sizeLabel)
+                <option value="{{ $sizeVal }}" {{ $currentSize === $sizeVal ? 'selected' : '' }}>{{ $sizeLabel }}</option>
+              @endforeach
             </select>
           </div>
         </div>

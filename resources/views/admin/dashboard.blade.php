@@ -23,6 +23,7 @@
       </div>
 
       <div style="display: flex; gap: 10px;">
+        <a href="{{ route('admin.permissions.index') }}" class="btn-login" style="background: #f8fafc; border: 1px solid var(--border-color);"><i class="fa-solid fa-user-shield"></i> Phân quyền</a>
         <a href="{{ route('admin.jobs.index') }}" class="btn-login" style="background: #f8fafc; border: 1px solid var(--border-color);">
           <i class="fa-solid fa-clipboard-check"></i> Duyệt tin ({{ $stats['pending_jobs'] }})
         </a>
@@ -204,6 +205,84 @@
         @endif
       </div>
 
+    </div>
+
+    <!-- Visual Charts & Top Viewed Jobs -->
+    <div style="margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px;">
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0 0 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+          <i class="fa-solid fa-chart-donut" style="color: #8b5cf6; margin-right: 8px;"></i> Biểu Đồ Trạng Thái Hồ Sơ Ứng Tuyển
+        </h3>
+        @php
+          $statusMeta = [
+            'submitted' => ['label' => 'Đã nộp', 'color' => '#2563eb'],
+            'viewed' => ['label' => 'NTD đã xem', 'color' => '#7c3aed'],
+            'interview' => ['label' => 'Phỏng vấn', 'color' => '#d97706'],
+            'accepted' => ['label' => 'Trúng tuyển', 'color' => '#059669'],
+            'rejected' => ['label' => 'Chưa phù hợp', 'color' => '#e11d48'],
+            'withdrawn' => ['label' => 'Đã rút', 'color' => '#64748b'],
+          ];
+          $totalAppsChart = array_sum($applicationStatusStats ?? []);
+          $circumference = 2 * M_PI * 54;
+          $offset = 0;
+        @endphp
+        @if($totalAppsChart === 0)
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Chưa có hồ sơ ứng tuyển nào để hiển thị biểu đồ.</p>
+        @else
+          <div class="admin-donut-wrap">
+            <svg viewBox="0 0 140 140" class="admin-donut-svg" aria-label="Biểu đồ trạng thái hồ sơ">
+              <circle cx="70" cy="70" r="54" fill="none" stroke="var(--border-color)" stroke-width="18"></circle>
+              @foreach($statusMeta as $key => $meta)
+                @php
+                  $count = $applicationStatusStats[$key] ?? 0;
+                  $segment = ($count / $totalAppsChart) * $circumference;
+                @endphp
+                @if($count > 0)
+                  <circle cx="70" cy="70" r="54" fill="none" stroke="{{ $meta['color'] }}" stroke-width="18"
+                          stroke-dasharray="{{ number_format($segment, 2, '.', '') }} {{ number_format($circumference, 2, '.', '') }}"
+                          stroke-dashoffset="-{{ number_format($offset, 2, '.', '') }}"
+                          transform="rotate(-90 70 70)"></circle>
+                  @php $offset += $segment; @endphp
+                @endif
+              @endforeach
+              <text x="70" y="67" text-anchor="middle" class="donut-center-num">{{ $totalAppsChart }}</text>
+              <text x="70" y="84" text-anchor="middle" class="donut-center-label">hồ sơ</text>
+            </svg>
+            <div class="admin-donut-legend">
+              @foreach($statusMeta as $key => $meta)
+                @php $count = $applicationStatusStats[$key] ?? 0; @endphp
+                <div class="legend-row">
+                  <span><i class="legend-dot" style="background:{{ $meta['color'] }}"></i> {{ $meta['label'] }}</span>
+                  <strong>{{ $count }} ({{ round(($count / $totalAppsChart) * 100) }}%)</strong>
+                </div>
+              @endforeach
+            </div>
+          </div>
+        @endif
+      </div>
+
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm);">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0 0 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+          <i class="fa-solid fa-eye" style="color: #0891b2; margin-right: 8px;"></i> Top Tin Tuyển Dụng Được Xem Nhiều Nhất
+        </h3>
+        @if($topViewedJobs->isEmpty())
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Chưa có dữ liệu lượt xem.</p>
+        @else
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            @foreach($topViewedJobs as $tJob)
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 10px;">
+                <div style="min-width: 0;">
+                  <a href="{{ route('jobs.show', $tJob->id) }}" style="font-weight: 600; color: var(--text-main); font-size: 0.92rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $tJob->title }}</a>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">{{ $tJob->company?->name }}</span>
+                </div>
+                <span style="font-weight: 700; color: #0891b2; font-size: 0.85rem; white-space: nowrap;">
+                  <i class="fa-regular fa-eye"></i> {{ number_format($tJob->views_count) }}
+                </span>
+              </div>
+            @endforeach
+          </div>
+        @endif
+      </div>
     </div>
 
   </div>

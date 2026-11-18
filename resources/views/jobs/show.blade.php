@@ -24,7 +24,11 @@
             {{ $job->title }}
           </h1>
           <div style="display: flex; align-items: center; gap: 12px; color: #cbd5e1; font-size: 0.95rem;">
-            <span>{{ $job->company ? $job->company->name : 'Doanh nghiệp ẩn danh' }}</span>
+            @if($job->company?->slug)
+              <a href="{{ route('companies.show', $job->company->slug) }}" style="color: #e2e8f0; font-weight: 600;">{{ $job->company->name }}</a>
+            @else
+              <span>{{ $job->company ? $job->company->name : 'Doanh nghiệp ẩn danh' }}</span>
+            @endif
             @if($job->company && $job->company->is_verified)
               <i class="fa-solid fa-circle-check" style="color: #38bdf8;" title="Doanh nghiệp xác thực"></i>
             @endif
@@ -35,7 +39,10 @@
       </div>
 
       <div style="display: flex; gap: 12px; align-items: center;">
-        @if($hasApplied)
+        <x-save-job :job-id="$job->id" :saved="in_array($job->id, $savedJobIds)" />
+        @if($job->status !== 'approved' || $job->is_expired)
+          <span class="preview-status">Bản xem trước · {{ $job->status === 'pending' ? 'Chờ Admin duyệt' : 'Tin chưa công khai' }}</span>
+        @elseif($hasApplied)
           <div style="padding: 10px 20px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: var(--radius-md); color: #34d399; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
             <i class="fa-solid fa-circle-check"></i> Bạn đã ứng tuyển vị trí này
           </div>
@@ -74,7 +81,7 @@
             </div>
             <div>
               <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Hình thức làm việc</span>
-              <strong style="color: var(--text-main); font-size: 1rem;">{{ ucfirst($job->type) }}</strong>
+              <strong style="color: var(--text-main); font-size: 1rem;">{{ $job->type_label }}</strong>
             </div>
           </div>
 
@@ -125,6 +132,46 @@
               @endforeach
             </div>
           </div>
+
+          @if(isset($matchAnalysis))
+            <div class="skill-match-panel">
+              <div class="skill-match-head">
+                <div>
+                  <span class="eyebrow" style="margin-bottom:4px;">PHÂN TÍCH HỒ SƠ CỦA BẠN</span>
+                  <h4>Độ phù hợp kỹ năng: <strong>{{ $matchAnalysis['score'] }}%</strong></h4>
+                </div>
+                <span class="match-badge {{ $matchAnalysis['tier_class'] }}">{{ $matchAnalysis['tier'] }}</span>
+              </div>
+              <div class="match-progress-track">
+                <div class="match-progress-bar" style="width: {{ $matchAnalysis['score'] }}%"></div>
+              </div>
+              @if($matchAnalysis['total_required'] > 0)
+                <div class="skill-match-lists">
+                  @if($matchAnalysis['matched']->isNotEmpty())
+                    <div>
+                      <small><i class="fa-solid fa-circle-check" style="color:#059669;"></i> Kỹ năng bạn đã có:</small>
+                      <div class="skill-pill-row">
+                        @foreach($matchAnalysis['matched'] as $ms)
+                          <span class="skill-pill is-matched">{{ $ms->name }}</span>
+                        @endforeach
+                      </div>
+                    </div>
+                  @endif
+                  @if($matchAnalysis['missing']->isNotEmpty())
+                    <div>
+                      <small><i class="fa-solid fa-circle-info" style="color:#d97706;"></i> Kỹ năng cần bổ sung:</small>
+                      <div class="skill-pill-row">
+                        @foreach($matchAnalysis['missing'] as $ms)
+                          <span class="skill-pill is-missing">{{ $ms->name }}</span>
+                        @endforeach
+                      </div>
+                    </div>
+                  @endif
+                </div>
+              @endif
+              <a href="{{ route('candidate.profile') }}" class="skill-match-link">Cập nhật kỹ năng trong hồ sơ <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+          @endif
         </div>
       </div>
 
@@ -160,9 +207,14 @@
           </div>
 
           @if($job->company && $job->company->description)
-            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; border-top: 1px solid var(--border-color); padding-top: 12px; margin: 0;">
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; border-top: 1px solid var(--border-color); padding-top: 12px; margin: 0 0 14px;">
               {{ Str::limit($job->company->description, 160) }}
             </p>
+          @endif
+          @if($job->company?->slug)
+            <a href="{{ route('companies.show', $job->company->slug) }}" class="btn-apply-sm" style="display:inline-flex; align-items:center; gap:6px; padding:8px 14px; font-size:0.85rem;">
+              Xem trang doanh nghiệp <i class="fa-solid fa-arrow-right"></i>
+            </a>
           @endif
         </div>
 
@@ -286,8 +338,8 @@
         <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">Yêu Cầu Đăng Nhập</h4>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">Bạn cần đăng nhập tài khoản Ứng viên để gửi CV trực tiếp đến nhà tuyển dụng.</p>
         <div style="display: flex; justify-content: center; gap: 12px;">
-          <a href="{{ route('login') }}" class="btn-search" style="padding: 10px 24px;">Đăng nhập ngay</a>
-          <a href="{{ route('register') }}" class="btn-login" style="background: #f1f5f9; border: 1px solid var(--border-color);">Đăng ký tài khoản</a>
+          <a href="{{ route('login', ['redirect' => '/jobs/'.$job->id]) }}" class="btn-search" style="padding: 10px 24px;">Đăng nhập ngay</a>
+          <a href="{{ route('register', ['redirect' => '/jobs/'.$job->id]) }}" class="btn-login" style="background: #f1f5f9; border: 1px solid var(--border-color);">Đăng ký tài khoản</a>
         </div>
       </div>
     @endauth

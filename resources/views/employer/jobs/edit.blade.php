@@ -23,6 +23,7 @@
         </span>
       </div>
 
+      <p class="moderation-note"><i class="fa-solid fa-shield-halved"></i> Tin mới hoặc nội dung chỉnh sửa cần được Admin phê duyệt trước khi hiển thị công khai.</p>
       <form action="{{ route('employer.jobs.update', $job->id) }}" method="POST">
         @csrf
         @method('PUT')
@@ -165,7 +166,7 @@
             Quay lại
           </a>
           <button type="submit" class="btn-search" style="padding: 12px 32px; font-size: 1rem;">
-            <i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i> Lưu cập nhật
+            <i class="fa-solid fa-floppy-disk" style="margin-right: 6px;"></i> Lưu và gửi duyệt lại
           </button>
         </div>
       </form>

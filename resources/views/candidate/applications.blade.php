@@ -46,6 +46,12 @@
                   <span><i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i> {{ $app->jobPost->location ? $app->jobPost->location->name : 'Toàn quốc' }}</span>
                   <span>•</span>
                   <span><i class="fa-regular fa-calendar-check" style="margin-right: 4px;"></i> Ngày nộp: {{ $app->applied_at ? $app->applied_at->format('d/m/Y H:i') : '' }}</span>
+                  @if($app->cv)
+                    <span>•</span>
+                    <a href="{{ route('cvs.download', $app->cv->id) }}" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: none;">
+                      <i class="fa-regular fa-file-pdf" style="margin-right: 4px;"></i> {{ $app->cv->title }}
+                    </a>
+                  @endif
                 </div>
               </div>
 
@@ -93,8 +99,8 @@
 
                 <div style="background: #ffffff; border: 1px solid #fef3c7; border-radius: var(--radius-sm); padding: 12px 16px; font-size: 0.9rem; color: var(--text-main); margin-bottom: 8px;">
                   <strong>Địa điểm / Đường dẫn:</strong> 
-                  @if($app->interview->interview_type === 'online')
-                    <a href="{{ $app->interview->location_or_link }}" target="_blank" style="color: var(--primary); font-weight: 600; word-break: break-all; margin-left: 6px;">
+                  @if($app->interview->interview_type === 'online' && preg_match('#^https?://#i', $app->interview->location_or_link))
+                    <a href="{{ $app->interview->location_or_link }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); font-weight: 600; word-break: break-all; margin-left: 6px;">
                       {{ $app->interview->location_or_link }} <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </a>
                   @else

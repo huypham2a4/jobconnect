@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -77,5 +76,15 @@ class User extends Authenticatable
     public function skills(): BelongsToMany
     {
         return $this->belongsToMany(Skill::class, 'user_skill');
+    }
+
+    public function savedJobs(): BelongsToMany
+    {
+        return $this->belongsToMany(JobPost::class, 'saved_jobs')->withTimestamps();
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class)->latest();
     }
 }

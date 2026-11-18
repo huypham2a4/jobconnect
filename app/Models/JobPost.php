@@ -31,6 +31,7 @@ class JobPost extends Model
         'type',
         'experience_level',
         'status',
+        'rejection_note',
         'is_featured',
         'deadline',
         'views_count',
@@ -89,30 +90,44 @@ class JobPost extends Model
     }
 
     // Accessors
+    public function getTypeLabelAttribute(): string
+    {
+        return [
+            'full-time' => 'Toàn thời gian',
+            'part-time' => 'Bán thời gian',
+            'remote' => 'Từ xa',
+            'internship' => 'Thực tập',
+            'hybrid' => 'Kết hợp',
+        ][$this->type] ?? (string) $this->type;
+    }
+
     public function getSalaryTextAttribute(): string
     {
-        if ($this->salary_negotiable || (!$this->salary_min && !$this->salary_max)) {
+        if ($this->salary_negotiable || (! $this->salary_min && ! $this->salary_max)) {
             return 'Thỏa thuận';
         }
 
         if ($this->salary_min && $this->salary_max) {
             $min = round($this->salary_min / 1000000);
             $max = round($this->salary_max / 1000000);
+
             return "{$min} - {$max} Triệu";
         }
 
         if ($this->salary_min) {
             $min = round($this->salary_min / 1000000);
+
             return "Từ {$min} Triệu";
         }
 
         $max = round($this->salary_max / 1000000);
+
         return "Lên đến {$max} Triệu";
     }
 
     public function getDaysLeftTextAttribute(): string
     {
-        if (!$this->deadline) {
+        if (! $this->deadline) {
             return '';
         }
 
@@ -133,9 +148,10 @@ class JobPost extends Model
 
     public function getIsExpiredAttribute(): bool
     {
-        if (!$this->deadline) {
+        if (! $this->deadline) {
             return false;
         }
+
         return Carbon::today()->gt(Carbon::parse($this->deadline));
     }
 }

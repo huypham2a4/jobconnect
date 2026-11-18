@@ -3,22 +3,25 @@
 > **Đồ Án Môn Học**: Lập Trình Mã Nguồn Mở (LTMNM)  
 > **Đơn Vị**: Trường Đại Học Công Thương TP.HCM (HUIT)  
 > **Nhóm Thực Hiện**: Nhóm 9  
-> **Nền Tảng Công Nghệ**: Laravel 12 + PHP 8.3 + MySQL (Laragon) + Blade Template + CSS thuần / Bootstrap 5 chuẩn hóa  
+> **Nền Tảng Công Nghệ**: Laravel 13 + PHP 8.3 + MySQL (Laragon) + Blade Template + Blade + CSS + JavaScript  
 
 ---
 
+**Chạy nhanh trên máy này:** nhấp đúp `CHAY_JOBCONNECT.bat` để mở Laragon, MySQL và web. Dùng `DUNG_JOBCONNECT.bat` để dừng web. Nhấp đúp `KIEM_TRA_TAT_CA.bat` để kiểm thử toàn bộ chức năng trên SQLite tạm, tách biệt dữ liệu MySQL. Xem [HUONG_DAN_TEST.md](HUONG_DAN_TEST.md) để test từng vai trò và biết các giới hạn hiện tại. Nút chạy giữ dữ liệu đã có, không dùng `migrate:fresh`.
+
 ## 1. GIỚI THIỆU DỰ ÁN
-JobConnect là nền tảng kết nối trực tiếp giữa **Ứng viên (Candidate)**, **Nhà tuyển dụng (Employer)** và được quản lý tập trung bởi **Quản trị viên (Admin)**. Hệ thống được chuyển đổi toàn diện sang mô hình kiến trúc MVC của Laravel 12, tuân thủ nghiêm ngặt chuẩn kiến thức thực hành từ Lab 1 đến Lab 8:
-- Sử dụng mô hình MVC chuẩn RESTful (7 actions resource).
+JobConnect là nền tảng kết nối trực tiếp giữa **Ứng viên (Candidate)**, **Nhà tuyển dụng (Employer)** và được quản lý tập trung bởi **Quản trị viên (Admin)**. Hệ thống được chuyển đổi toàn diện sang mô hình kiến trúc MVC của Laravel 13, vận dụng kiến thức PHP, SQL và Laravel từ các tài liệu thực hành:
+- Sử dụng MVC, named routes, route group, middleware và các action quản lý chức năng.
 - Xác thực phân quyền session-based bảo mật thuần (không phụ thuộc Breeze/Sanctum).
 - Quan hệ Eloquent chặt chẽ (`hasMany`, `belongsTo`, `belongsToMany`, `hasOne`).
-- Thiết kế giao diện kép: Chế độ **Chuẩn (Light/Corporate)** và chế độ **"Tái Sinh – Bùng Cháy" (Rebirth Dark/Fire)** chuyển đổi tức thì bằng công tắc gạt.
+- Giao diện sáng/tối, menu tài khoản theo vai trò và bố cục thích ứng điện thoại.
+- Lưu việc làm bền vững trong database; tin mới/sửa/mở lại đều cần Admin duyệt.
 
 ---
 
 ## 2. YÊU CẦU MÔI TRƯỜNG & PHẦN MỀM
 - **Hệ thống phát triển**: Laragon (khuyến nghị trên Windows).
-- **PHP**: Phiên bản `>= 8.2` (Hiện tại đang chạy trên PHP 8.3.30 ZTS).
+- **PHP**: Phiên bản `>= 8.3` (Hiện tại đang chạy trên PHP 8.3.30 ZTS).
 - **Cơ sở dữ liệu**: MySQL 8.x / MariaDB.
 - **Quản lý gói**: Composer 2.x.
 - **Trình duyệt**: Chrome, Edge, Firefox, Brave.
@@ -56,7 +59,7 @@ JobConnect là nền tảng kết nối trực tiếp giữa **Ứng viên (Cand
    ```
 
 ### Bước 3: Cài đặt thư viện phụ thuộc
-Mở terminal trong thư mục dự án (`E:\LTMNM\laragon\www\jobconnect`):
+Mở terminal trong thư mục dự án (`D:\Laragon_PHP\laragon\www\DA\jobconnect-main`):
 ```bash
 composer install
 ```
@@ -94,8 +97,8 @@ Mật khẩu chung cho tất cả tài khoản mẫu là: **`password`**
 | **Quản trị viên (Admin)** | `admin@jobconnect.vn` | `password` | Duyệt/từ chối tin, khóa/mở người dùng, quản lý danh mục, thống kê Join & Group By. |
 | **Nhà tuyển dụng 1** | `fpt@jobconnect.vn` | `password` | Quản lý tin FPT Software, xét duyệt hồ sơ ứng viên, gửi lời mời phỏng vấn, gia hạn tin. |
 | **Nhà tuyển dụng 2** | `shopee@jobconnect.vn` | `password` | Quản lý tin Shopee Vietnam, quản lý hồ sơ, cập nhật thông tin công ty. |
-| **Ứng viên 1** | `nguyenvanan@gmail.com` | `password` | Xem việc làm, ứng tuyển, quản lý CV (PDF/Docx), theo dõi trạng thái, rút hồ sơ. |
-| **Ứng viên 2** | `tranthib@gmail.com` | `password` | Tìm kiếm theo kỹ năng, nộp hồ sơ kèm thư ngỏ, cập nhật kỹ năng cá nhân. |
+| **Ứng viên 1** | `ungvien@jobconnect.vn` | `password` | Xem việc làm, ứng tuyển, quản lý CV (PDF/Docx), theo dõi trạng thái, rút hồ sơ. |
+| **Ứng viên 2** | `bichngoc@jobconnect.vn` | `password` | Tìm kiếm theo kỹ năng, nộp hồ sơ kèm thư ngỏ, cập nhật kỹ năng cá nhân. |
 
 ---
 
@@ -143,7 +146,7 @@ jobconnect/
 │   │   └── Middleware/        # RoleMiddleware (phân quyền session thuần)
 │   └── Models/                # User, Company, JobPost, Application, Interview, Cv, Category, Skill, Location
 ├── database/
-│   ├── migrations/            # 10 file migration chuẩn Laravel 12
+│   ├── migrations/            # 10 file migration chuẩn Laravel 13
 │   └── seeders/               # DatabaseSeeder dữ liệu mẫu thực tế
 ├── public/
 │   ├── css/                   # jobconnect.css (chuẩn) & theme-rebirth.css (Tái Sinh - Bùng Cháy)

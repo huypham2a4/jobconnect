@@ -40,7 +40,7 @@
     <!-- Quick Stats Cards -->
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px;">
       <div class="employer-stat-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px;">
-        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(90, 26, 30, 0.5); color: var(--ember); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
           <i class="fa-solid fa-briefcase"></i>
         </div>
         <div>
@@ -50,7 +50,7 @@
       </div>
 
       <div class="employer-stat-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px;">
-        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(90, 26, 30, 0.5); color: var(--core-gold); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: #ecfdf5; color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
           <i class="fa-solid fa-circle-check"></i>
         </div>
         <div>
@@ -60,7 +60,7 @@
       </div>
 
       <div class="employer-stat-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px;">
-        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(90, 26, 30, 0.5); color: var(--flare-pink); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: #fdf2f8; color: #db2777; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
           <i class="fa-solid fa-users"></i>
         </div>
         <div>
@@ -70,7 +70,7 @@
       </div>
 
       <div class="employer-stat-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; gap: 16px;">
-        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(90, 26, 30, 0.5); color: var(--ember); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: #fffbeb; color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
           <i class="fa-solid fa-calendar-check"></i>
         </div>
         <div>

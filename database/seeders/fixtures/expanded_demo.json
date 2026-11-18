@@ -1,0 +1,116 @@
+{
+  "companies": [
+    ["An Việt Digital", "an-viet-digital", "hcm"],
+    ["Mây Xanh Cloud", "may-xanh-cloud", "hn"],
+    ["Bình Minh Creative", "binh-minh-creative", "dn"],
+    ["Sao Bắc Commerce", "sao-bac-commerce", "hai-phong"],
+    ["Sen Việt Solutions", "sen-viet-solutions", "can-tho"],
+    ["Hải Đăng Logistics", "hai-dang-logistics", "hcm"],
+    ["Đại Việt Education", "dai-viet-education", "hn"],
+    ["Lá Xanh Retail", "la-xanh-retail", "hcm"],
+    ["Minh Khuê Studio", "minh-khue-studio", "dn"],
+    ["Đông Phong Software", "dong-phong-software", "hue"],
+    ["Nam Việt Services", "nam-viet-services", "can-tho"],
+    ["Bầu Trời Data", "bau-troi-data", "hn"],
+    ["Trúc Việt Media", "truc-viet-media", "hcm"],
+    ["Ánh Dương Fintech", "anh-duong-fintech", "dong-nai"],
+    ["Sóng Biển Technology", "song-bien-technology", "khanh-hoa"],
+    ["Tân Phát Business", "tan-phat-business", "hcm"],
+    ["Hoa Sen Product", "hoa-sen-product", "hcm"],
+    ["Bắc Nam Connect", "bac-nam-connect", "hai-phong"],
+    ["Mộc Việt Labs", "moc-viet-labs", "dn"],
+    ["Hành Trình Innovation", "hanh-trinh-innovation", "hn"]
+  ],
+  "locations": [
+    ["TP. Hồ Chí Minh", "hcm"], ["Hà Nội", "hn"], ["Đà Nẵng", "dn"],
+    ["Cần Thơ", "can-tho"], ["Hải Phòng", "hai-phong"], ["Khánh Hòa", "khanh-hoa"],
+    ["Huế", "hue"], ["Đồng Nai", "dong-nai"],
+    ["Làm việc từ xa (Remote)", "remote"]
+  ],
+  "profiles": [
+    {
+      "slug": "it-software", "name": "Công Nghệ Thông Tin", "icon": "fa-solid fa-code", "bg_class": "icon-blue",
+      "skills": ["PHP", "Laravel 12", "MySQL", "Git", "REST API", "ReactJS", "TypeScript"],
+      "roles": ["Lập trình viên PHP Laravel", "Frontend Developer ReactJS", "Kỹ sư kiểm thử phần mềm", "Backend Developer REST API"],
+      "summary": "Phát triển và kiểm thử ứng dụng web, làm việc với cơ sở dữ liệu và tối ưu trải nghiệm người dùng.",
+      "tasks": ["Phát triển tính năng theo yêu cầu sản phẩm và tài liệu phân tích.", "Viết kiểm thử, kiểm tra mã nguồn và xử lý lỗi phát sinh.", "Phối hợp với đội thiết kế, kiểm thử và vận hành để bàn giao đúng tiến độ."],
+      "requirements": ["Nắm kiến thức lập trình hướng đối tượng, HTTP và cơ sở dữ liệu quan hệ.", "Sử dụng Git, đọc tài liệu kỹ thuật và chủ động trao đổi trong nhóm."],
+      "project": "Website quản lý tuyển dụng bằng PHP và MySQL, có đăng nhập, tìm kiếm và quản lý hồ sơ."
+    },
+    {
+      "slug": "marketing", "name": "Marketing & Truyền Thông", "icon": "fa-solid fa-bullhorn", "bg_class": "icon-cyan",
+      "skills": ["SEO", "Google Ads", "Content Marketing", "Data Analytics", "TikTok Ads"],
+      "roles": ["Chuyên viên Digital Marketing", "Content Creator", "Chuyên viên SEO", "Chuyên viên Performance Marketing"],
+      "summary": "Xây dựng nội dung, triển khai chiến dịch truyền thông và đo lường hiệu quả theo mục tiêu kinh doanh.",
+      "tasks": ["Lập kế hoạch nội dung và triển khai chiến dịch trên các kênh số.", "Theo dõi lượt tiếp cận, chi phí và tỷ lệ chuyển đổi của từng chiến dịch.", "Phối hợp với đội thiết kế và kinh doanh để tối ưu nội dung quảng bá."],
+      "requirements": ["Có khả năng viết nội dung rõ ràng và tìm hiểu nhu cầu khách hàng.", "Biết đọc báo cáo, sử dụng công cụ quảng cáo hoặc tối ưu tìm kiếm."],
+      "project": "Kế hoạch truyền thông đa kênh cho cửa hàng trực tuyến, kèm lịch nội dung và báo cáo hiệu quả."
+    },
+    {
+      "slug": "sales", "name": "Kinh Doanh & Bán Hàng", "icon": "fa-solid fa-chart-line", "bg_class": "icon-emerald",
+      "skills": ["B2B Sales", "CRM", "Đàm phán", "Excel", "Giao tiếp"],
+      "roles": ["Nhân viên Kinh doanh B2B", "Account Executive", "Chuyên viên Phát triển thị trường", "Tư vấn Giải pháp doanh nghiệp"],
+      "summary": "Tư vấn giải pháp, chăm sóc đối tác và phát triển khách hàng theo kế hoạch kinh doanh của đội nhóm.",
+      "tasks": ["Tìm hiểu nhu cầu và giới thiệu giải pháp phù hợp cho khách hàng.", "Chuẩn bị báo giá, theo dõi hợp đồng và cập nhật thông tin trên CRM.", "Chăm sóc đối tác hiện hữu và phối hợp xử lý yêu cầu sau bán hàng."],
+      "requirements": ["Giao tiếp rõ ràng, biết lắng nghe và tổ chức công việc.", "Sử dụng bảng tính, có tinh thần chủ động và theo sát mục tiêu."],
+      "project": "Xây dựng danh sách khách hàng tiềm năng, quy trình tư vấn và báo cáo doanh số theo tuần."
+    },
+    {
+      "slug": "finance", "name": "Tài Chính & Kế Toán", "icon": "fa-solid fa-wallet", "bg_class": "icon-amber",
+      "skills": ["Kế toán thuế", "Excel", "Phân tích tài chính", "MISA", "Power BI"],
+      "roles": ["Kế toán Tổng hợp", "Chuyên viên Phân tích tài chính", "Kế toán Thanh toán", "Chuyên viên Kế hoạch ngân sách"],
+      "summary": "Theo dõi chứng từ, đối chiếu số liệu và hỗ trợ lập báo cáo tài chính, ngân sách nội bộ.",
+      "tasks": ["Kiểm tra, phân loại và lưu trữ chứng từ theo quy trình công ty.", "Đối chiếu công nợ, theo dõi thu chi và tổng hợp dữ liệu định kỳ.", "Phối hợp với các bộ phận để lập kế hoạch ngân sách và báo cáo quản trị."],
+      "requirements": ["Cẩn thận với số liệu, làm việc có hệ thống và giữ bảo mật thông tin.", "Sử dụng Excel và có kiến thức chuyên ngành tài chính hoặc kế toán."],
+      "project": "Bộ báo cáo thu chi và công nợ doanh nghiệp giả lập, có đối chiếu số liệu và biểu đồ ngân sách."
+    },
+    {
+      "slug": "design", "name": "Thiết Kế UI/UX & Đồ Họa", "icon": "fa-solid fa-palette", "bg_class": "icon-purple",
+      "skills": ["Figma", "UI/UX", "Photoshop", "Illustrator", "User Research"],
+      "roles": ["UI/UX Designer", "Graphic Designer", "Product Designer", "Thiết kế Nhận diện thương hiệu"],
+      "summary": "Thiết kế sản phẩm số và hình ảnh thương hiệu, chú trọng bố cục, khả năng sử dụng và tính nhất quán.",
+      "tasks": ["Phân tích yêu cầu, phác thảo luồng sử dụng và xây dựng bản mẫu.", "Thiết kế giao diện hoặc ấn phẩm theo nhận diện thương hiệu.", "Tiếp nhận phản hồi, kiểm tra tính nhất quán và bàn giao tài nguyên thiết kế."],
+      "requirements": ["Sử dụng Figma hoặc công cụ thiết kế phù hợp với vị trí.", "Có portfolio minh họa tư duy bố cục, màu sắc và quy trình thiết kế."],
+      "project": "Thiết kế giao diện website tuyển dụng, gồm bộ thành phần, mẫu điện thoại và nguyên mẫu tương tác."
+    },
+    {
+      "slug": "hr", "name": "Nhân Sự & Tuyển Dụng", "icon": "fa-solid fa-users-gear", "bg_class": "icon-rose",
+      "skills": ["Tuyển dụng", "Excel", "Giao tiếp", "Đào tạo nội bộ", "C&B"],
+      "roles": ["Chuyên viên Tuyển dụng", "Nhân viên Hành chính nhân sự", "Chuyên viên C&B", "Chuyên viên Đào tạo và phát triển"],
+      "summary": "Hỗ trợ tuyển dụng, quản lý hồ sơ và tổ chức hoạt động đào tạo, phát triển đội ngũ.",
+      "tasks": ["Tiếp nhận nhu cầu nhân sự, đăng tin và sàng lọc hồ sơ theo tiêu chí.", "Sắp xếp lịch phỏng vấn, trao đổi thông tin và hướng dẫn nhân viên mới.", "Cập nhật hồ sơ, tổng hợp báo cáo và phối hợp tổ chức hoạt động nội bộ."],
+      "requirements": ["Giao tiếp phù hợp, có khả năng tổ chức và sắp xếp thời gian.", "Cẩn thận khi xử lý hồ sơ và sử dụng được các công cụ văn phòng."],
+      "project": "Quy trình tuyển dụng giả lập từ tiếp nhận nhu cầu đến phỏng vấn và kế hoạch hội nhập nhân viên."
+    },
+    {
+      "slug": "customer-service", "name": "Dịch Vụ Khách Hàng", "icon": "fa-solid fa-headset", "bg_class": "icon-teal",
+      "skills": ["Chăm sóc khách hàng", "CRM", "Giao tiếp", "Xử lý tình huống", "Tiếng Anh"],
+      "roles": ["Nhân viên Chăm sóc khách hàng", "Customer Success Specialist", "Chuyên viên Hỗ trợ sản phẩm", "Tư vấn viên Dịch vụ khách hàng"],
+      "summary": "Tiếp nhận câu hỏi, hướng dẫn sử dụng dịch vụ và phối hợp giải quyết phản hồi của khách hàng.",
+      "tasks": ["Tiếp nhận và phân loại yêu cầu qua các kênh hỗ trợ của công ty.", "Hướng dẫn khách hàng sử dụng dịch vụ và theo dõi tiến độ xử lý.", "Ghi nhận phản hồi, cập nhật nội dung hướng dẫn và báo cáo vấn đề lặp lại."],
+      "requirements": ["Kiên nhẫn, biết lắng nghe và trình bày thông tin dễ hiểu.", "Sử dụng máy tính, nhập liệu chính xác và phối hợp làm việc theo ca."],
+      "project": "Bộ câu hỏi thường gặp và quy trình tiếp nhận, phân loại, xử lý phản hồi khách hàng."
+    },
+    {
+      "slug": "project-management", "name": "Quản Lý Dự Án & Agile", "icon": "fa-solid fa-list-check", "bg_class": "icon-indigo",
+      "skills": ["Agile/Scrum", "Jira", "Business Analysis", "Giao tiếp", "Quản lý dự án"],
+      "roles": ["Business Analyst", "Điều phối Dự án", "Scrum Master", "Product Owner"],
+      "summary": "Làm rõ yêu cầu, tổ chức kế hoạch và theo dõi tiến độ bàn giao sản phẩm cùng các bộ phận liên quan.",
+      "tasks": ["Trao đổi với các bên liên quan và mô tả yêu cầu công việc rõ ràng.", "Lập kế hoạch, theo dõi rủi ro và cập nhật tiến độ trên công cụ quản lý.", "Tổ chức các buổi trao đổi và phối hợp kiểm tra kết quả bàn giao."],
+      "requirements": ["Tư duy phân tích, ghi chép rõ ràng và quản lý thời gian hiệu quả.", "Hiểu quy trình phát triển sản phẩm và có khả năng phối hợp nhiều bộ phận."],
+      "project": "Bộ tài liệu phân tích nghiệp vụ website tuyển dụng, gồm user story, kế hoạch sprint và tiêu chí nghiệm thu."
+    }
+  ],
+  "candidates": [
+    "Nguyễn Minh Anh", "Trần Quốc Bảo", "Lê Hoài Phương", "Phạm Gia Huy", "Hoàng Ngọc Linh",
+    "Vũ Thu Hà", "Đặng Minh Khang", "Bùi Quỳnh Như", "Đỗ Hải Đăng", "Hồ Bảo Ngọc",
+    "Ngô Thanh Tùng", "Dương Khánh Vy", "Lý Nhật Minh", "Mai Phương Thảo", "Đinh Tuấn Kiệt",
+    "Nguyễn Thùy Dương", "Trần Đức Anh", "Lê Mỹ Duyên", "Phạm Quang Huy", "Hoàng Kim Ngân",
+    "Vũ Anh Tuấn", "Đặng Ngọc Hân", "Bùi Thành Đạt", "Đỗ Minh Châu", "Hồ Quốc Khánh",
+    "Ngô Bảo Trâm", "Dương Hoàng Long", "Lý Thanh Hương", "Mai Đức Phúc", "Đinh Ngọc Mai",
+    "Nguyễn Tiến Dũng", "Trần Hải Yến", "Lê Khánh Duy", "Phạm Thu Trang", "Hoàng Minh Triết",
+    "Vũ Bích Hạnh", "Đặng Quang Minh", "Bùi Thảo Nguyên", "Đỗ Gia Bảo", "Hồ Ngọc Ánh",
+    "Ngô Nhật Nam", "Dương Phương Nhi", "Lý Đức Huy", "Mai Thanh Tâm", "Đinh Bảo Khang",
+    "Nguyễn Khánh Linh", "Trần Minh Quân", "Lê Ngọc Diệp", "Phạm Anh Khoa", "Hoàng Thu Uyên"
+  ]
+}

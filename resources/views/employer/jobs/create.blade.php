@@ -17,16 +17,9 @@
         </p>
       </div>
 
-      @if($errors->any())
-        <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 24px; font-size: 0.9rem;">
-          <ul style="list-style: none; margin: 0; padding: 0;">
-            @foreach($errors->all() as $err)
-              <li><i class="fa-solid fa-triangle-exclamation" style="margin-right: 6px;"></i> {{ $err }}</li>
-            @endforeach
-          </ul>
-        </div>
-      @endif
+      
 
+      <p class="moderation-note"><i class="fa-solid fa-shield-halved"></i> Tin mới hoặc nội dung chỉnh sửa cần được Admin phê duyệt trước khi hiển thị công khai.</p>
       <form action="{{ route('employer.jobs.store') }}" method="POST">
         @csrf
 
@@ -182,7 +175,7 @@
             Hủy
           </a>
           <button type="submit" class="btn-search" style="padding: 12px 32px; font-size: 1rem;">
-            <i class="fa-solid fa-paper-plane" style="margin-right: 6px;"></i> Xuất bản tin tuyển dụng
+            <i class="fa-solid fa-paper-plane" style="margin-right: 6px;"></i> Gửi Admin duyệt
           </button>
         </div>
       </form>

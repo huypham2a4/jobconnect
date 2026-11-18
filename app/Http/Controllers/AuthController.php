@@ -3,19 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\RolePermission;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
-    public function showLoginForm()
+    public function showLoginForm(Request $request)
     {
         if (Auth::check()) {
             return $this->redirectBasedOnRole(Auth::user());
         }
+
+        $this->rememberPublicRedirect($request);
 
         return view('auth.login');
     }
@@ -36,7 +42,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
 
-            if (!$user->is_active) {
+            if (! $user->is_active) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
@@ -48,8 +54,8 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
-            return $this->redirectBasedOnRole($user)
-                ->with('success', 'Đăng nhập thành công! Chào mừng ' . $user->name);
+            return $this->redirectAfterAuth($request, $user)
+                ->with('success', 'Đăng nhập thành công! Chào mừng '.$user->name);
         }
 
         return back()->withErrors([
@@ -57,11 +63,13 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    public function showRegisterForm()
+    public function showRegisterForm(Request $request)
     {
         if (Auth::check()) {
             return $this->redirectBasedOnRole(Auth::user());
         }
+
+        $this->rememberPublicRedirect($request);
 
         return view('auth.register');
     }
@@ -78,7 +86,7 @@ class AuthController extends Controller
 
         if ($request->role === 'employer') {
             $rules['company_name'] = ['required', 'string', 'max:255'];
-            $rules['city'] = ['required', 'string', 'max:100'];
+            $rules['city'] = ['required', 'string', Rule::in(config('provinces'))];
             $rules['address'] = ['nullable', 'string', 'max:255'];
         }
 
@@ -103,17 +111,10 @@ class AuthController extends Controller
         ]);
 
         if ($user->role === 'employer') {
-            $slug = Str::slug($validated['company_name']);
-            // Ensure unique slug
-            $existingCount = Company::where('slug', 'like', $slug . '%')->count();
-            if ($existingCount > 0) {
-                $slug .= '-' . ($existingCount + 1);
-            }
-
             Company::create([
                 'user_id' => $user->id,
                 'name' => $validated['company_name'],
-                'slug' => $slug,
+                'slug' => $this->uniqueSlug(Company::class, $validated['company_name'], null, 'cong-ty'),
                 'city' => $validated['city'],
                 'address' => $validated['address'] ?? null,
                 'is_verified' => false,
@@ -123,7 +124,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return $this->redirectBasedOnRole($user)
+        return $this->redirectAfterAuth($request, $user)
             ->with('success', 'Đăng ký tài khoản thành công!');
     }
 
@@ -136,12 +137,163 @@ class AuthController extends Controller
         return redirect()->route('home')->with('success', 'Đã đăng xuất khỏi tài khoản.');
     }
 
+    /**
+     * Ghi nhớ trang công khai (tin tuyển dụng, công ty) mà khách đang xem trước khi bấm Đăng nhập/Đăng ký,
+     * để sau khi đăng nhập quay lại đúng trang đó thay vì về trang tổng quan.
+     */
+    protected function rememberPublicRedirect(Request $request): void
+    {
+        $path = (string) $request->query('redirect', '');
+
+        if ($this->isSafePublicPath($path)) {
+            $request->session()->put('auth.redirect_after_login', $path);
+        }
+    }
+
+    protected function isSafePublicPath(string $path): bool
+    {
+        return (bool) preg_match('#^/(jobs|companies)(/[A-Za-z0-9\-_]+)?/?(\?[A-Za-z0-9\-_=&%.+]*)?$#', $path);
+    }
+
+    protected function redirectAfterAuth(Request $request, User $user)
+    {
+        $path = (string) $request->session()->pull('auth.redirect_after_login', '');
+
+        if ($this->isSafePublicPath($path)) {
+            return redirect($path);
+        }
+
+        return $this->redirectBasedOnRole($user);
+    }
+
     protected function redirectBasedOnRole(User $user)
     {
-        return match ($user->role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'employer' => redirect()->route('employer.dashboard'),
-            default => redirect()->route('candidate.dashboard'),
-        };
+        $permissions = RolePermission::forRole($user->role);
+        $routes = config('role_permissions.routes');
+        foreach (array_keys(config('role_permissions.navigation.'.$user->role, [])) as $route) {
+            if ($user->is_active && ($permissions[$routes[$route]] ?? false)) {
+                return redirect()->route($route);
+            }
+        }
+
+        return redirect()->route('home');
+    }
+
+    public function showForgotPasswordForm()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function sendResetLink(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'email'],
+        ], [
+            'email.required' => 'Vui lòng nhập địa chỉ email.',
+            'email.email' => 'Định dạng email không hợp lệ.',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+        // Cùng một thông báo cho mọi trường hợp để người lạ không dò được email nào đã đăng ký.
+        $genericMessage = 'Nếu email tồn tại và tài khoản đang hoạt động, liên kết đặt lại mật khẩu đã được tạo (hiệu lực 60 phút).';
+
+        if (! $user || ! $user->is_active) {
+            return back()->with('success', $genericMessage);
+        }
+
+        $plainToken = Str::random(64);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'token' => Hash::make($plainToken),
+                'created_at' => Carbon::now(),
+            ]
+        );
+
+        $resetUrl = route('password.reset', ['token' => $plainToken, 'email' => $user->email]);
+
+        $response = back()->with('success', $genericMessage);
+
+        if (app()->environment('local', 'testing')) {
+            $response->with('demo_reset_url', $resetUrl);
+        }
+
+        return $response;
+    }
+
+    public function showResetPasswordForm(Request $request, string $token)
+    {
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email', ''),
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validated = $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ], [
+            'email.required' => 'Vui lòng nhập địa chỉ email.',
+            'password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'password.min' => 'Mật khẩu mới phải có tối thiểu 6 ký tự.',
+            'password.confirmed' => 'Xác nhận mật khẩu không trùng khớp.',
+        ]);
+
+        $record = DB::table('password_reset_tokens')->where('email', $validated['email'])->first();
+
+        if (! $record || ! Hash::check($validated['token'], $record->token)) {
+            return back()->withErrors(['email' => 'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.'])->onlyInput('email');
+        }
+
+        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
+
+            return back()->withErrors(['email' => 'Liên kết đặt lại mật khẩu đã hết hạn (quá 60 phút).'])->onlyInput('email');
+        }
+
+        $user = User::where('email', $validated['email'])->first();
+        if (! $user || ! $user->is_active) {
+            return back()->withErrors(['email' => 'Không thể đặt lại mật khẩu cho tài khoản này.'])->onlyInput('email');
+        }
+
+        $user->forceFill([
+            'password' => Hash::make($validated['password']),
+            'remember_token' => Str::random(60),
+        ])->save();
+        DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
+
+        return redirect()->route('login')->with('success', 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.');
+    }
+
+    public function showChangePasswordForm()
+    {
+        return view('auth.change-password');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:6', 'confirmed', 'different:current_password'],
+        ], [
+            'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+            'password.required' => 'Vui lòng nhập mật khẩu mới.',
+            'password.min' => 'Mật khẩu mới phải có tối thiểu 6 ký tự.',
+            'password.confirmed' => 'Xác nhận mật khẩu mới không trùng khớp.',
+            'password.different' => 'Mật khẩu mới phải khác mật khẩu hiện tại.',
+        ]);
+
+        $user = Auth::user();
+        if (! Hash::check($validated['current_password'], $user->password)) {
+            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác.']);
+        }
+
+        $user->update(['password' => Hash::make($validated['password'])]);
+
+        return back()->with('success', 'Đã cập nhật mật khẩu tài khoản thành công.');
     }
 }

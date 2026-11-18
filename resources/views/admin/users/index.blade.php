@@ -27,6 +27,11 @@
           <option value="employer" {{ request('role') === 'employer' ? 'selected' : '' }}>Nhà tuyển dụng (Employer)</option>
           <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Quản trị viên (Admin)</option>
         </select>
+
+        <button type="submit" class="btn-search" style="padding: 8px 14px; font-size: 0.85rem;">Tìm kiếm</button>
+        @if(request()->filled('q') || request()->filled('role'))
+          <a href="{{ route('admin.users.index') }}" class="btn-login" style="padding: 8px 12px; font-size: 0.82rem; border: 1px solid var(--border-color);">Xóa lọc</a>
+        @endif
       </form>
     </div>
 
@@ -52,6 +57,12 @@
                   </strong>
                   <span style="font-size: 0.8rem; color: var(--text-muted);">
                     ID: #{{ $u->id }}
+                    @if($u->isEmployer() && $u->company)
+                      · <a href="{{ route('companies.show', $u->company->slug) }}" style="color: var(--primary);">{{ $u->company->name }}</a>
+                      @if($u->company->is_verified)
+                        <i class="fa-solid fa-circle-check verified-badge" title="Doanh nghiệp đã xác thực"></i>
+                      @endif
+                    @endif
                   </span>
                 </td>
 
@@ -93,6 +104,15 @@
                 </td>
 
                 <td style="padding: 16px 20px; text-align: right;">
+                  <a class="user-permissions-link" href="{{ route('admin.permissions.index', ['role' => $u->role, 'user_id' => $u->id]) }}#user-access">Xem quyền</a>
+                  @if($u->isEmployer() && $u->company)
+                    <form action="{{ route('admin.users.verify-company', $u->company->id) }}" method="POST" style="display: inline; margin-right: 6px;">
+                      @csrf
+                      <button type="submit" class="btn-login" style="padding: 6px 10px; font-size: 0.8rem; border: 1px solid var(--border-color); color: {{ $u->company->is_verified ? '#64748b' : '#0284c7' }};">
+                        <i class="fa-solid fa-circle-check"></i> {{ $u->company->is_verified ? 'Bỏ xác thực' : 'Xác thực DN' }}
+                      </button>
+                    </form>
+                  @endif
                   @if($u->id !== auth()->id())
                     <form action="{{ route('admin.users.toggle', $u->id) }}" method="POST" style="display: inline;">
                       @csrf

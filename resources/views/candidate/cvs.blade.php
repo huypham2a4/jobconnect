@@ -59,13 +59,13 @@
 
               <div style="display: flex; align-items: center; gap: 10px;">
                 @if($cv->file_path)
-                  <a href="{{ asset('storage/' . $cv->file_path) }}" target="_blank" class="btn-login" style="padding: 6px 12px; font-size: 0.82rem; background: #f8fafc; border: 1px solid var(--border-color); color: var(--primary);" title="Xem hoặc tải về CV">
+                  <a href="{{ route('cvs.download', $cv->id) }}" target="_blank" class="btn-login" style="padding: 6px 12px; font-size: 0.82rem; background: #f8fafc; border: 1px solid var(--border-color); color: var(--primary);" title="Xem hoặc tải về CV">
                     <i class="fa-solid fa-download"></i> Xem CV
                   </a>
                 @endif
 
                 <!-- Sửa tên CV -->
-                <button type="button" onclick="openEditCvModal('{{ $cv->id }}', '{{ addslashes($cv->title) }}')" class="btn-login" style="padding: 6px 12px; font-size: 0.82rem; background: #f8fafc; border: 1px solid var(--border-color);" title="Đổi tên hồ sơ">
+                <button type="button" data-cv-id="{{ $cv->id }}" data-cv-title="{{ $cv->title }}" class="btn-login edit-cv-button" style="padding: 6px 12px; font-size: 0.82rem; background: #f8fafc; border: 1px solid var(--border-color);" title="Đổi tên hồ sơ">
                   <i class="fa-solid fa-pen-to-square"></i> Sửa tên
                 </button>
 
@@ -153,6 +153,16 @@
 </div>
 
 <script>
+// Chọn tệp xong thì tự điền tên hồ sơ theo tên file (bỏ đuôi .pdf/.docx, đổi dấu _ thành khoảng trắng); không ghi đè nếu người dùng đã tự gõ.
+const cvTitleInput = document.getElementById('title');
+document.getElementById('cv_file')?.addEventListener('change', event => {
+  const file = event.target.files[0];
+  if (!file || !cvTitleInput || (cvTitleInput.value.trim() !== '' && cvTitleInput.dataset.autoFilled !== 'true')) return;
+  cvTitleInput.value = file.name.replace(/\.[^.]+$/, '').replace(/_+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 255);
+  cvTitleInput.dataset.autoFilled = 'true';
+});
+cvTitleInput?.addEventListener('input', () => { cvTitleInput.dataset.autoFilled = 'false'; });
+document.querySelectorAll('.edit-cv-button').forEach(button => button.addEventListener('click', () => openEditCvModal(button.dataset.cvId, button.dataset.cvTitle)));
 function openEditCvModal(id, title) {
   const form = document.getElementById('edit-cv-form');
   form.action = "{{ url('/candidate/cvs') }}/" + id;
